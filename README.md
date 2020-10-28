@@ -8,15 +8,11 @@ The default hotkey is:
 
 | Hotkey                                            | Action                                     |
 | ------------------------------------------------- | ------------------------------------------ |
-| <kbd>Ctrl/Cmd</kbd> <kbd>Shift</kbd> + <kbd>N</kbd>                    | Copy selection into new note and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | Copy selection into new note and replace with a link.                 |
 
-The new file is created at the root of the vault.
+The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
-Headings `#` and other illegal characters for filenames are removed including `:`, `\`, `/`.
-
-A check is done to avoid overwriting of existing files but...
-
-    💥 PLEASE TRY IN A TEST VAULT FIRST! 💥
+Headings (`#`) characters and other illegal characters for filenames are removed including `:`, `\`, `/`.
 
 ## Demo
 
@@ -24,4 +20,12 @@ TODO
 
 ## Installing
 
-TODO
+1. Download the [latest release](https://github.com/lynchjames/note-refactor-obsidian/releases/latest)
+1. Extract the note-refactor-obsidian folder from the zip to your vault's plugins folder: `<vault>/.obsidian/plugins/`  
+Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should be able to press `Command+Shift+Dot` to show the folder in Finder.
+1. Reload Obsidian
+1. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
+
+A check is done to avoid overwriting of existing files but...
+
+    💥 PLEASE TRY IN A TEST VAULT FIRST..AND MAKE SURE TO BACKUP! 💥
