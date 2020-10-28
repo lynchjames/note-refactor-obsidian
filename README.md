@@ -2,7 +2,9 @@
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for extracting the selected portion of a notes into new note. 
 
-The defaults hotkey is:
+Credit to [MrJackphil](https://github.com/mrjackphil), this plugin is based on [the code snippet](https://forum.obsidian.md/t/code-snippet-extract-note/6698) he created.
+
+The default hotkey is:
 
 | Hotkey                                            | Action                                     |
 | ------------------------------------------------- | ------------------------------------------ |
