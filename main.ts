@@ -41,7 +41,7 @@ export default class NoteRefactor extends Plugin {
 
       const rootFolder = this.app.vault.getRoot();
 
-      let headerRegex = /[:\/\\#]/gim;
+      let headerRegex = /[^\w\s_-]+/gim;
 
       //TODO: Use file path settings
       let fileName = header.replace(headerRegex, '').trim();
