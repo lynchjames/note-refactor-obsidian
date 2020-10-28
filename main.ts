@@ -37,8 +37,12 @@ export default class NoteRefactor extends Plugin {
 
       if (!selectedText) { return }
 
-      const [header, ...contentArr] = selectedText.split('\n')
-
+      var _a = selectedText.split('\n'), header = _a[0], contentArr = _a; //doesn't splice header anymore
+      //if first char of first substring is letter, adds header.
+      //TODO: Check for subheadings and replace with just a #; check for ol or ul and add new line with blank header (# /n)
+      if ((/[a-zA-Z]/).test(contentArr[0].charAt(0)) ) {
+      contentArr[0] = "# " + contentArr[0];
+      }
       const rootFolder = this.app.vault.getRoot();
 
       let headerRegex = /[^\w\s_-]+/gim;
