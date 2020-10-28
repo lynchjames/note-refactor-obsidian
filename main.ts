@@ -5,6 +5,7 @@ import {
   Plugin,
   PluginSettingTab,
   Setting,
+  Modal
 } from "obsidian";
 
 export default class NoteRefactor extends Plugin {
@@ -17,13 +18,25 @@ export default class NoteRefactor extends Plugin {
     this.settings = (await this.loadData()) || new NoteRefactorSettings();
 
     this.addCommand({
-      id: 'app:extract-selection',
-      name: 'Extract selection to new note',
-      callback: () => this.extractSelection(),
+      id: 'app:extract-selection-first-line',
+      name: 'Extract selection to new note - first line as file name',
+      callback: () => this.extractSelectionFirstLine(),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
           key: "n",
+        },
+      ],
+    });
+
+    this.addCommand({
+      id: 'app:extract-selection-content-only',
+      name: 'Extract selection to new note - content only',
+      callback: () => this.extractSelectionContentOnly(),
+      hotkeys: [
+        {
+          modifiers: ["Mod", "Shift"],
+          key: "c",
         },
       ],
     });
@@ -35,27 +48,21 @@ export default class NoteRefactor extends Plugin {
     console.log("Unloading Note Refactor plugin");
   }
 
-  extractSelection(): void {
-      const markdownSourceView = this.app.workspace.activeLeaf.getViewState();
+  extractSelectionFirstLine(): void {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       if(!mdView) {return}
       const doc = mdView.sourceMode.cmEditor;
-      const selectedText = doc.getSelection()
+      
+      let selectedContent = this.selectedContent(doc);
+      if(selectedContent.length <= 0) { return }
 
-      if (!selectedText) { return }
+      const [header, ...contentArr] = selectedContent;
 
-      const [header, ...contentArr] = selectedText.split('\n')
-
-      const rootFolder = this.app.vault.getRoot();
-
-      let headerRegex = /[^\w\s_-]+/gim;
-
+      let fileName = this.sanitisedFileName(header);
       //TODO: Use file path settings
-      let fileName = header.replace(headerRegex, '').trim();
       let filePath = fileName + '.md';
       this.app.vault.adapter.exists(filePath, false).then((exists) => {
         if(exists){
-          console.log('File exists!')
           new Notice(`A file namde ${fileName} already exists`);
           return;
         } else {
@@ -67,6 +74,30 @@ export default class NoteRefactor extends Plugin {
       });
   }
 
+  extractSelectionContentOnly(): void {
+    const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
+    if(!mdView) {return}
+    const doc = mdView.sourceMode.cmEditor;
+    
+    let contentArr = this.selectedContent(doc);
+    if(contentArr.length <= 0) { return }
+    this.loadModal(this.sanitisedFileName(contentArr[0]), contentArr, doc);
+  }
+
+  sanitisedFileName(unsanitisedFilename: string): string {
+    const headerRegex = /[^\w\s_-]+/gim;
+    return unsanitisedFilename.replace(headerRegex, '').trim();
+  }
+
+  selectedContent(doc:CodeMirror.Editor): string[] {
+    let selectedText = doc.getSelection()
+    return selectedText.split('\n')
+  }
+
+  loadModal(fileName: string, contentArr:string[], doc:CodeMirror.Editor): void {
+    new FileNameModal(this.app, this.noteContent(fileName, contentArr.slice(1)), doc).open();
+  }
+
   noteContent(fileName:string, contentArr:string[]): string {
     if(this.settings.includeFirstLineAsNoteHeading){
       //Adds formatted heading into content array as first item. 
@@ -75,6 +106,54 @@ export default class NoteRefactor extends Plugin {
     }
     return contentArr.join('\n').trim()
   }
+}
+
+class FileNameModal extends Modal {
+  content: string;
+  doc: CodeMirror.Editor;
+	constructor(app: App, content: string, doc: CodeMirror.Editor) {
+    super(app);
+    this.content = content;
+    this.doc = doc;
+  }
+
+	onOpen() {
+    let {contentEl} = this;
+    let fileName = '';
+
+    new Setting(contentEl)
+        .setName('File name')
+        .setDesc('Enter the name of the new note')
+        .addText((text) =>
+            text
+              .onChange((value) => {
+                fileName = value;
+              }))
+        .addButton((button) => 
+            button
+              .setButtonText('Create Note')
+              .setCta()
+              .onClick(() => {
+                let filePath = fileName + '.md';
+                  this.app.vault.adapter.exists(filePath, false).then((exists) => {
+                    if(exists){
+                      new Notice(`A file namde ${fileName} already exists`);
+                      return;
+                    } else {
+                      this.app.vault.create(filePath, this.content).then((newFile) => {
+                        this.doc.replaceSelection(`[[${fileName}]]`);
+                        this.app.workspace.openLinkText(fileName, filePath, true);
+                        this.close();
+                      });
+                    }
+                  });
+              }));
+    }
+
+	onClose() {
+		let {contentEl} = this;
+		contentEl.empty();
+	}
 }
 
 class NoteRefactorSettings {
@@ -101,8 +180,7 @@ class NoteRefactorSettingsTab extends PluginSettingTab {
         .onChange((value) => {
           this.plugin.settings.includeFirstLineAsNoteHeading = value;
           this.plugin.saveData(this.plugin.settings);
-          console.log('Include heading setting: ', this.plugin.settings)
-            this.display();
+          this.display();
         }));
 
     if(this.plugin.settings.includeFirstLineAsNoteHeading){
