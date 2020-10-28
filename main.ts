@@ -3,13 +3,18 @@ import {
   MarkdownView,
   Notice,
   Plugin,
+  PluginSettingTab,
+  Setting,
 } from "obsidian";
 
 export default class NoteRefactor extends Plugin {
+  settings: NoteRefactorSettings;
+
   onInit() {}
 
-  onload() {
+  async onload() {
     console.log("Loading Note Refactor plugin");
+    this.settings = (await this.loadData()) || new NoteRefactorSettings();
 
     this.addCommand({
       id: 'app:extract-selection',
@@ -22,6 +27,8 @@ export default class NoteRefactor extends Plugin {
         },
       ],
     });
+
+    this.addSettingTab(new NoteRefactorSettingsTab(this.app, this));
   }
 
   onunload() {
@@ -58,5 +65,50 @@ export default class NoteRefactor extends Plugin {
           });
         }
       });
+  }
+}
+
+class NoteRefactorSettings {
+  includeFirstLineAsNoteHeading: boolean = false;
+  headingFormat: string = '#';
+}
+
+class NoteRefactorSettingsTab extends PluginSettingTab {
+  plugin: NoteRefactor;
+  constructor(app: App, plugin: NoteRefactor) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+  
+  display(): void {
+    let { containerEl } = this;
+    let headerFormatSetting: Setting;
+
+    containerEl.empty();
+
+    new Setting(containerEl)
+      .setName('Include Heading')
+      .setDesc('Include first line of selection as note heading')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
+        .onChange((value) => {
+          this.plugin.settings.includeFirstLineAsNoteHeading = value;
+          this.plugin.saveData(this.plugin.settings);
+          console.log('Include heading setting: ', this.plugin.settings)
+            this.display();
+        }));
+
+    if(this.plugin.settings.includeFirstLineAsNoteHeading){
+      new Setting(containerEl)
+        .setName('Heading format')
+        .setDesc('Set format of the heading to be included in note content')
+        .addText((text) =>
+            text
+                .setPlaceholder("# or ##")
+                .setValue(this.plugin.settings.headingFormat || '#')
+                .onChange((value) => {
+                    this.plugin.settings.headingFormat = value;
+                    this.plugin.saveData(this.plugin.settings);
+        }));
+      }
   }
 }
