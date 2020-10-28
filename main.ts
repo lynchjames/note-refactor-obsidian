@@ -69,7 +69,9 @@ export default class NoteRefactor extends Plugin {
 
   noteContent(fileName:string, contentArr:string[]): string {
     if(this.settings.includeFirstLineAsNoteHeading){
-      contentArr.unshift(`${this.settings.headingFormat} ${fileName}`)
+      //Adds formatted heading into content array as first item. 
+      //Trimming allows for an empty heading format. 
+      contentArr.unshift(`${this.settings.headingFormat} ${fileName}`.trim())
     }
     return contentArr.join('\n').trim()
   }
@@ -89,7 +91,6 @@ class NoteRefactorSettingsTab extends PluginSettingTab {
   
   display(): void {
     let { containerEl } = this;
-    let headerFormatSetting: Setting;
 
     containerEl.empty();
 
@@ -111,7 +112,7 @@ class NoteRefactorSettingsTab extends PluginSettingTab {
         .addText((text) =>
             text
                 .setPlaceholder("# or ##")
-                .setValue(this.plugin.settings.headingFormat || '#')
+                .setValue(this.plugin.settings.headingFormat)
                 .onChange((value) => {
                     this.plugin.settings.headingFormat = value;
                     this.plugin.saveData(this.plugin.settings);

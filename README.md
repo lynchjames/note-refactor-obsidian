@@ -16,7 +16,26 @@ Headings (`#`) characters and other illegal characters for filenames are removed
 
 ## Demo
 
-TODO
+### First Line as Note File Name
+This command copies the selected text into the content of a new note using the first line as the file name for the new note.
+![first line file name demo](images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
+
+### Extract to Note Content Only
+This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
+
+DEMO TBC
+
+### First Line included as Note Heading
+A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`... 
+![note heading demo](images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
+
+
+
+## Compatibility
+
+Custom plugins are only available for Obsidian v0.9.7+.
+
+The current API of this repo targets Obsidian **v0.9.7**. 
 
 ## Installing
 
