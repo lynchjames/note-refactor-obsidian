@@ -1,0 +1,7 @@
+{
+  "id": "note-refactor-obsidian",
+  "name": "Note Refactor",
+  "description": "Copy a text selection into a new note",
+  "isDesktopOnly": false,
+  "js": "main.js"
+}
