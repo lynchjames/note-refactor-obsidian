@@ -59,12 +59,19 @@ export default class NoteRefactor extends Plugin {
           new Notice(`A file namde ${fileName} already exists`);
           return;
         } else {
-          this.app.vault.create(filePath, contentArr.join('\n').trim()).then((newFile) => {
+          this.app.vault.create(filePath, this.noteContent(fileName, contentArr)).then((newFile) => {
             doc.replaceSelection(`[[${fileName}]]`);
             this.app.workspace.openLinkText(fileName, filePath, true);
           });
         }
       });
+  }
+
+  noteContent(fileName:string, contentArr:string[]): string {
+    if(this.settings.includeFirstLineAsNoteHeading){
+      contentArr.unshift(`${this.settings.headingFormat} ${fileName}`)
+    }
+    return contentArr.join('\n').trim()
   }
 }
 
