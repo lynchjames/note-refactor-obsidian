@@ -8,8 +8,11 @@ The default hotkey is:
 
 | Hotkey                                                                   | Action                           |
 | ------------------------------------------------------------------------ | -------------------------------- |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **First Line as Note File Name:** Copy selection into new note with the first line as the file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **Extract selection to new note - first line as filename:** Copy selection into new note with the first line as the file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **Extract selection to new note - first line as filename:** Copy selection into new note with the first line as the file name and replace with a link.                 |
 | <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
+
+    ‼️ Hotkey defaults are not set for note splitting commands.
 
 The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
@@ -17,11 +20,23 @@ Headings (`#`) characters and other illegal characters for filenames are removed
 
 ## Commands
 
-### First Line as Note File Name
+### Note Splitting
+Splitting the current note from the current line into a new note.
+
+#### Split note here - current ine as note file name
+This command splits the current note into a new note from the current line using the current line as the file name for the new note.
+
+#### Split note here - content only
+This command splits the current note into a new note from the current line. The user is prompted to enter a file name for the new note.
+
+### Extract Selection
+Extracting the current selection into a new note.
+
+#### Extract selection to new note - first line as filename
 This command copies the selected text into the content of a new note using the first line as the file name for the new note.
 ![first line file name demo](images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
 
-### Extract to Note Content Only
+### Extract selection to new note - content only
 This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
 
 ![content only demo](images/Note-Refactor-Demo-Content-Only.gif)

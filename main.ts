@@ -20,7 +20,7 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-first-line',
       name: 'Extract selection to new note - first line as file name',
-      callback: () => this.extractSelectionFirstLine(),
+      callback: () => this.extractSelectionFirstLine(false),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
@@ -32,13 +32,27 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-content-only',
       name: 'Extract selection to new note - content only',
-      callback: () => this.extractSelectionContentOnly(),
+      callback: () => this.extractSelectionContentOnly(false),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
           key: "c",
         },
       ],
+    });
+
+    this.addCommand({
+      id: 'app:split-note-first-line',
+      name: 'Split note here - first line as file name',
+      callback: () => this.extractSelectionFirstLine(true),
+      hotkeys: [],
+    });
+
+    this.addCommand({
+      id: 'app:split-note-content-only',
+      name: 'Split note here - content only',
+      callback: () => this.extractSelectionContentOnly(true),
+      hotkeys: [],
     });
 
     this.addSettingTab(new NoteRefactorSettingsTab(this.app, this));
@@ -48,12 +62,12 @@ export default class NoteRefactor extends Plugin {
     console.log("Unloading Note Refactor plugin");
   }
 
-  extractSelectionFirstLine(): void {
+  extractSelectionFirstLine(split:boolean): void {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       if(!mdView) {return}
       const doc = mdView.sourceMode.cmEditor;
       
-      let selectedContent = this.selectedContent(doc);
+      let selectedContent = split ? this.noteRemainder(doc) : this.selectedContent(doc);
       if(selectedContent.length <= 0) { return }
 
       const [header, ...contentArr] = selectedContent;
@@ -67,21 +81,21 @@ export default class NoteRefactor extends Plugin {
           return;
         } else {
           this.app.vault.create(filePath, this.noteContent(fileName, contentArr)).then((newFile) => {
-            doc.replaceSelection(`[[${fileName}]]`);
+            this.replaceContent(fileName, doc, split)
             this.app.workspace.openLinkText(fileName, filePath, true);
           });
         }
       });
   }
 
-  extractSelectionContentOnly(): void {
+  extractSelectionContentOnly(split:boolean): void {
     const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
     if(!mdView) {return}
     const doc = mdView.sourceMode.cmEditor;
     
-    let contentArr = this.selectedContent(doc);
+    let contentArr = split? this.noteRemainder(doc): this.selectedContent(doc);
     if(contentArr.length <= 0) { return }
-    this.loadModal(this.sanitisedFileName(contentArr[0]), contentArr, doc);
+    this.loadModal(this.sanitisedFileName(contentArr[0]), contentArr, doc, split);
   }
 
   sanitisedFileName(unsanitisedFilename: string): string {
@@ -94,8 +108,32 @@ export default class NoteRefactor extends Plugin {
     return selectedText.split('\n')
   }
 
-  loadModal(fileName: string, contentArr:string[], doc:CodeMirror.Editor): void {
-    new FileNameModal(this.app, this.noteContent(fileName, contentArr.slice(1)), doc).open();
+  noteRemainder(doc:CodeMirror.Editor): string[] {
+    doc.setCursor(doc.getCursor().line, 0);
+    let currentLine = doc.getCursor();
+    let endPosition = doc.posFromIndex(doc.getValue().length);
+    let content = doc.getRange(currentLine, endPosition);
+    return content.split('\n');
+  }
+
+  removeNoteRemainder(doc:CodeMirror.Editor, text:string): void {
+    let currentLine = doc.getCursor();
+    let endPosition = doc.posFromIndex(doc.getValue().length);
+    doc.replaceRange(text, currentLine, endPosition);
+  }
+
+  replaceContent(fileName:string, doc:CodeMirror.Editor, split?:boolean): void {
+    let internalLink = `[[${fileName}]]`;
+    if(split){ 
+      this.removeNoteRemainder(doc, internalLink);
+    } else {
+      doc.replaceSelection(internalLink);
+    }
+
+  }
+
+  loadModal(fileName: string, contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
+    new FileNameModal(this, this.noteContent(fileName, contentArr.slice(1)), doc, split).open();
   }
 
   noteContent(fileName:string, contentArr:string[]): string {
@@ -109,12 +147,16 @@ export default class NoteRefactor extends Plugin {
 }
 
 class FileNameModal extends Modal {
+  plugin: NoteRefactor;
   content: string;
   doc: CodeMirror.Editor;
-	constructor(app: App, content: string, doc: CodeMirror.Editor) {
-    super(app);
+  split: boolean;
+	constructor(plugin: NoteRefactor, content: string, doc: CodeMirror.Editor, split: boolean) {
+    super(plugin.app);
+    this.plugin = plugin;
     this.content = content;
     this.doc = doc;
+    this.split = split;
   }
 
 	onOpen() {
@@ -141,7 +183,7 @@ class FileNameModal extends Modal {
                       return;
                     } else {
                       this.app.vault.create(filePath, this.content).then((newFile) => {
-                        this.doc.replaceSelection(`[[${fileName}]]`);
+                        this.plugin.replaceContent(fileName, this.doc, this.split);
                         this.app.workspace.openLinkText(fileName, filePath, true);
                         this.close();
                       });
