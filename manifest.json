@@ -1,7 +1,7 @@
 {
   "id": "note-refactor-obsidian",
   "name": "Note Refactor",
-  "description": "Copy a text selection into a new note",
+  "description": "Extract note content into new notes and split notes",
   "isDesktopOnly": false,
   "js": "main.js"
 }
