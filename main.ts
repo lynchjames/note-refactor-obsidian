@@ -80,7 +80,7 @@ export default class NoteRefactor extends Plugin {
           new Notice(`A file named ${fileName} already exists`);
           return;
         } else {
-          this.app.vault.create(filePath, this.noteContent(fileName, contentArr)).then((newFile) => {
+          this.app.vault.create(filePath, this.noteContent(header, contentArr)).then((newFile) => {
             this.replaceContent(fileName, doc, split)
             this.app.workspace.openLinkText(fileName, filePath, true);
           });
@@ -95,7 +95,7 @@ export default class NoteRefactor extends Plugin {
     
     let contentArr = split? this.noteRemainder(doc): this.selectedContent(doc);
     if(contentArr.length <= 0) { return }
-    this.loadModal(this.sanitisedFileName(contentArr[0]), contentArr, doc, split);
+    this.loadModal(contentArr, doc, split);
   }
 
   sanitisedFileName(unsanitisedFilename: string): string {
@@ -132,15 +132,18 @@ export default class NoteRefactor extends Plugin {
 
   }
 
-  loadModal(fileName: string, contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
-    new FileNameModal(this, this.noteContent(fileName, contentArr.slice(1)), doc, split).open();
+  loadModal(contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
+    new FileNameModal(this, this.noteContent(contentArr[0], contentArr.slice(1)), doc, split).open();
   }
 
-  noteContent(fileName:string, contentArr:string[]): string {
+  noteContent(firstLine:string, contentArr:string[]): string {
     if(this.settings.includeFirstLineAsNoteHeading){
       //Adds formatted heading into content array as first item. 
       //Trimming allows for an empty heading format. 
-      contentArr.unshift(`${this.settings.headingFormat} ${fileName}`.trim())
+      contentArr.unshift(`${this.settings.headingFormat} ${firstLine}`.trim());
+    } else {
+      //Adds first line back into content if it is not to be included as a header
+      contentArr.unshift(firstLine);
     }
     return contentArr.join('\n').trim()
   }
