@@ -9,7 +9,7 @@ The default hotkey is:
 | Hotkey                                                                   | Action                           |
 | ------------------------------------------------------------------------ | -------------------------------- |
 | <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **Extract selection to new note - first line as filename:** Copy selection into new note with the first line as the file name and replace with a link.                 |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract selection to new note - content only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
 
     
 >:warning: Hotkey defaults are deliberately not set for note splitting commands to avoid unwanted accidents.
