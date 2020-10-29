@@ -77,7 +77,7 @@ export default class NoteRefactor extends Plugin {
       let filePath = fileName + '.md';
       this.app.vault.adapter.exists(filePath, false).then((exists) => {
         if(exists){
-          new Notice(`A file namde ${fileName} already exists`);
+          new Notice(`A file named ${fileName} already exists`);
           return;
         } else {
           this.app.vault.create(filePath, this.noteContent(fileName, contentArr)).then((newFile) => {
@@ -163,11 +163,11 @@ class FileNameModal extends Modal {
     let {contentEl} = this;
     let fileName = '';
 
-    new Setting(contentEl)
-        .setName('File name')
-        .setDesc('Enter the name of the new note')
+    let setting = new Setting(contentEl)
+        .setName('New note name')
         .addText((text) =>
             text
+              .setPlaceholder('Note name')
               .onChange((value) => {
                 fileName = value;
               }))
@@ -179,7 +179,7 @@ class FileNameModal extends Modal {
                 let filePath = fileName + '.md';
                   this.app.vault.adapter.exists(filePath, false).then((exists) => {
                     if(exists){
-                      new Notice(`A file namde ${fileName} already exists`);
+                      new Notice(`A file named ${fileName} already exists`);
                       return;
                     } else {
                       this.app.vault.create(filePath, this.content).then((newFile) => {
@@ -190,6 +190,7 @@ class FileNameModal extends Modal {
                     }
                   });
               }));
+      setting.controlEl.focus();
     }
 
 	onClose() {
