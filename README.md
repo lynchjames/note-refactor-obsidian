@@ -12,7 +12,7 @@ The default hotkey is:
 | <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
 
     
-    :warning: Hotkey defaults are deliberately not set for note splitting commands to avoid unwanted accidents.
+    ⚠️ Hotkey defaults are deliberately not set for note splitting commands to avoid unwanted accidents.
 
 The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
