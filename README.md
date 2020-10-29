@@ -8,8 +8,8 @@ The default hotkey is:
 
 | Hotkey                                                                   | Action                           |
 | ------------------------------------------------------------------------ | -------------------------------- |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **First Line as Note File Name** Copy selection into new note with the first line as the file name and replace with a link.                 |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only** Copy selection into new note, prompt for a file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **First Line as Note File Name:** Copy selection into new note with the first line as the file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
 
 The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
@@ -26,7 +26,7 @@ This command only copies the selected text into the content of a new note. The u
 
 ![content only demo](images/Note-Refactor-Demo-Content-Only.gif)
 
-## Configurtion
+## Configuration
 
 ### First Line included as Note Heading
 A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
