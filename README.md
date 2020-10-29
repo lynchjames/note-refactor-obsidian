@@ -12,7 +12,7 @@ The default hotkey is:
 | <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only:** Copy selection into new note, prompt for a file name and replace with a link.                 |
 
     
-:warning: Hotkey defaults are deliberately not set for note splitting commands to avoid unwanted accidents.
+>:warning: Hotkey defaults are deliberately not set for note splitting commands to avoid unwanted accidents.
 
 The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
@@ -23,7 +23,7 @@ Headings (`#`) characters and other illegal characters for filenames are removed
 ### Note Splitting
 Splitting the current note from the current line into a new note.
 
-#### Split note here - current ine as note file name
+#### Split note here - current line as note file name
 This command splits the current note into a new note from the current line using the current line as the file name for the new note.
 
 #### Split note here - content only
@@ -36,7 +36,7 @@ Extracting the current selection into a new note.
 This command copies the selected text into the content of a new note using the first line as the file name for the new note.
 ![first line file name demo](images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
 
-### Extract selection to new note - content only
+#### Extract selection to new note - content only
 This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
 
 ![content only demo](images/Note-Refactor-Demo-Content-Only.gif)
