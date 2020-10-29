@@ -6,16 +6,16 @@ Credit to [MrJackphil](https://github.com/mrjackphil), this plugin is based on [
 
 The default hotkey is:
 
-| Hotkey                                            | Action                                     |
-| ------------------------------------------------- | ------------------------------------------ |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | Copy selection into new note with the first line as the file name and replace with a link.                 |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | Copy selection into new note, prompt for a file name and replace with a link.                 |
+| Hotkey                                                                   | Action                           |
+| ------------------------------------------------------------------------ | -------------------------------- |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>                    | **First Line as Note File Name** Copy selection into new note with the first line as the file name and replace with a link.                 |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                    | **Extract to Note Content Only** Copy selection into new note, prompt for a file name and replace with a link.                 |
 
 The new note file is created at the root of the vault with the filename as the first line of the selected text and the content as the rest of the selected text.
 
 Headings (`#`) characters and other illegal characters for filenames are removed including `:`, `\`, `/`.
 
-## Demo
+## Commands
 
 ### First Line as Note File Name
 This command copies the selected text into the content of a new note using the first line as the file name for the new note.
@@ -25,6 +25,8 @@ This command copies the selected text into the content of a new note using the f
 This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
 
 ![content only demo](images/Note-Refactor-Demo-Content-Only.gif)
+
+## Configurtion
 
 ### First Line included as Note Heading
 A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
