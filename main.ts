@@ -138,9 +138,12 @@ export default class NoteRefactor extends Plugin {
 
   noteContent(firstLine:string, contentArr:string[]): string {
     if(this.settings.includeFirstLineAsNoteHeading){
+      //Replaces any non-word characters whitespace leading the first line to enforce consistent heading format from setting
+      const headingRegex = /^[#\s-]*/;
+      let headingBaseline = firstLine.replace(headingRegex, '');
       //Adds formatted heading into content array as first item. 
       //Trimming allows for an empty heading format. 
-      contentArr.unshift(`${this.settings.headingFormat} ${firstLine}`.trim());
+      contentArr.unshift(`${this.settings.headingFormat} ${headingBaseline}`.trim());
     } else {
       //Adds first line back into content if it is not to be included as a header
       contentArr.unshift(firstLine);
@@ -179,7 +182,8 @@ class FileNameModal extends Modal {
               .setButtonText('Create Note')
               .setCta()
               .onClick(() => {
-                let filePath = fileName + '.md';
+                //Sanitising again just in case
+                let filePath = this.plugin.sanitisedFileName(fileName) + '.md';
                   this.app.vault.adapter.exists(filePath, false).then((exists) => {
                     if(exists){
                       new Notice(`A file named ${fileName} already exists`);
