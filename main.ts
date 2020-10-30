@@ -99,7 +99,7 @@ export default class NoteRefactor extends Plugin {
   }
 
   sanitisedFileName(unsanitisedFilename: string): string {
-    const headerRegex = /[^\w\s_-]+/gim;
+    const headerRegex = /[*"\/\\<>:|]/gim;
     return unsanitisedFilename.replace(headerRegex, '').trim();
   }
 
