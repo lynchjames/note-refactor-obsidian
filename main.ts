@@ -76,14 +76,14 @@ export default class NoteRefactor extends Plugin {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.sourceMode.cmEditor;
       
-      let selectedContent = split ? this.noteRemainder(doc) : this.selectedContent(doc);
+      const selectedContent = split ? this.noteRemainder(doc) : this.selectedContent(doc);
       if(selectedContent.length <= 0) { return }
 
       const [header, ...contentArr] = selectedContent;
 
-      let fileName = this.sanitisedFileName(header);
+      const fileName = this.sanitisedFileName(header);
       //TODO: Use file path settings
-      let filePath = fileName + '.md';
+      const filePath = fileName + '.md';
       this.app.vault.adapter.exists(filePath, false).then((exists) => {
         if(exists){
           new Notice(`A file named ${fileName} already exists`);
@@ -102,7 +102,7 @@ export default class NoteRefactor extends Plugin {
     if(!mdView) {return}
     const doc = mdView.sourceMode.cmEditor;
     
-    let contentArr = split? this.noteRemainder(doc): this.selectedContent(doc);
+    const contentArr = split? this.noteRemainder(doc): this.selectedContent(doc);
     if(contentArr.length <= 0) { return }
     this.loadModal(contentArr, doc, split);
   }
@@ -113,26 +113,26 @@ export default class NoteRefactor extends Plugin {
   }
 
   selectedContent(doc:CodeMirror.Editor): string[] {
-    let selectedText = doc.getSelection()
+    const selectedText = doc.getSelection()
     return selectedText.split('\n')
   }
 
   noteRemainder(doc:CodeMirror.Editor): string[] {
     doc.setCursor(doc.getCursor().line, 0);
-    let currentLine = doc.getCursor();
-    let endPosition = doc.posFromIndex(doc.getValue().length);
-    let content = doc.getRange(currentLine, endPosition);
+    const currentLine = doc.getCursor();
+    const endPosition = doc.posFromIndex(doc.getValue().length);
+    const content = doc.getRange(currentLine, endPosition);
     return content.split('\n');
   }
 
   removeNoteRemainder(doc:CodeMirror.Editor, text:string): void {
-    let currentLine = doc.getCursor();
-    let endPosition = doc.posFromIndex(doc.getValue().length);
+    const currentLine = doc.getCursor();
+    const endPosition = doc.posFromIndex(doc.getValue().length);
     doc.replaceRange(text, currentLine, endPosition);
   }
 
   replaceContent(fileName:string, doc:CodeMirror.Editor, split?:boolean): void {
-    let internalLink = `[[${fileName}]]`;
+    const internalLink = `[[${fileName}]]`;
     if(split){ 
       this.removeNoteRemainder(doc, internalLink);
     } else {
@@ -149,7 +149,7 @@ export default class NoteRefactor extends Plugin {
     if(this.settings.includeFirstLineAsNoteHeading){
       //Replaces any non-word characters whitespace leading the first line to enforce consistent heading format from setting
       const headingRegex = /^[#\s-]*/;
-      let headingBaseline = firstLine.replace(headingRegex, '');
+      const headingBaseline = firstLine.replace(headingRegex, '');
       //Adds formatted heading into content array as first item. 
       //Trimming allows for an empty heading format. 
       contentArr.unshift(`${this.settings.headingFormat} ${headingBaseline}`.trim());
@@ -175,10 +175,10 @@ class FileNameModal extends Modal {
   }
 
 	onOpen() {
-    let {contentEl} = this;
+    const {contentEl} = this;
     let fileName = '';
 
-    let setting = new Setting(contentEl)
+    const setting = new Setting(contentEl)
         .setName('New note name')
         .addText((text) =>
             text
@@ -192,25 +192,25 @@ class FileNameModal extends Modal {
               .setCta()
               .onClick(() => {
                 //Sanitising again just in case
-                let filePath = this.plugin.sanitisedFileName(fileName) + '.md';
-                  this.app.vault.adapter.exists(filePath, false).then((exists) => {
-                    if(exists){
-                      new Notice(`A file named ${fileName} already exists`);
-                      return;
-                    } else {
-                      this.app.vault.create(filePath, this.content).then((newFile) => {
-                        this.plugin.replaceContent(fileName, this.doc, this.split);
-                        this.app.workspace.openLinkText(fileName, filePath, true);
-                        this.close();
-                      });
-                    }
-                  });
+                const filePath = this.plugin.sanitisedFileName(fileName) + '.md';
+                this.app.vault.adapter.exists(filePath, false).then((exists) => {
+                  if(exists){
+                    new Notice(`A file named ${fileName} already exists`);
+                    return;
+                  } else {
+                    this.app.vault.create(filePath, this.content).then((newFile) => {
+                      this.plugin.replaceContent(fileName, this.doc, this.split);
+                      this.app.workspace.openLinkText(fileName, filePath, true);
+                      this.close();
+                    });
+                  }
+                });
               }));
       setting.controlEl.focus();
     }
 
 	onClose() {
-		let {contentEl} = this;
+		const {contentEl} = this;
 		contentEl.empty();
 	}
 }
@@ -228,7 +228,7 @@ class NoteRefactorSettingsTab extends PluginSettingTab {
   }
   
   display(): void {
-    let { containerEl } = this;
+    const { containerEl } = this;
 
     containerEl.empty();
 
