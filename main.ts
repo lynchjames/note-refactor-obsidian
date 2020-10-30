@@ -20,7 +20,7 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-first-line',
       name: 'Extract selection to new note - first line as file name',
-      callback: () => this.extractSelectionFirstLine(false),
+      callback: () => this.editModeGuard(() => this.extractSelectionFirstLine(false)),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
@@ -32,7 +32,7 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-content-only',
       name: 'Extract selection to new note - content only',
-      callback: () => this.extractSelectionContentOnly(false),
+      callback: () => this.editModeGuard(() => this.extractSelectionContentOnly(false)),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
@@ -44,14 +44,14 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:split-note-first-line',
       name: 'Split note here - first line as file name',
-      callback: () => this.extractSelectionFirstLine(true),
+      callback: () => this.editModeGuard(() => this.extractSelectionFirstLine(true)),
       hotkeys: [],
     });
 
     this.addCommand({
       id: 'app:split-note-content-only',
       name: 'Split note here - content only',
-      callback: () => this.extractSelectionContentOnly(true),
+      callback: () => this.editModeGuard(() => this.extractSelectionContentOnly(true)),
       hotkeys: [],
     });
 
@@ -62,9 +62,18 @@ export default class NoteRefactor extends Plugin {
     console.log("Unloading Note Refactor plugin");
   }
 
+  editModeGuard(command: () => any): void {
+    const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
+    if(!mdView || mdView.getMode() !== 'source') {
+      new Notification('Please use Note Refactor plugin in edit mode');
+      return;
+    } else {
+      command();
+    }
+  }
+
   extractSelectionFirstLine(split:boolean): void {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
-      if(!mdView) {return}
       const doc = mdView.sourceMode.cmEditor;
       
       let selectedContent = split ? this.noteRemainder(doc) : this.selectedContent(doc);
@@ -100,7 +109,7 @@ export default class NoteRefactor extends Plugin {
 
   sanitisedFileName(unsanitisedFilename: string): string {
     const headerRegex = /[*"\/\\<>:|]/gim;
-    return unsanitisedFilename.replace(headerRegex, '').trim();
+    return unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
   }
 
   selectedContent(doc:CodeMirror.Editor): string[] {
