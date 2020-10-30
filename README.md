@@ -34,12 +34,12 @@ Extracting the current selection into a new note.
 
 #### Extract selection to new note - first line as filename
 This command copies the selected text into the content of a new note using the first line as the file name for the new note.
-![first line file name demo](images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
+![first line file name demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
 
 #### Extract selection to new note - content only
 This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
 
-![content only demo](images/Note-Refactor-Demo-Content-Only.gif)
+![content only demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Content-Only.gif)
 
 ## Configuration
 
@@ -47,7 +47,7 @@ This command only copies the selected text into the content of a new note. The u
 A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
 
 This setting is applied for either the First Line filename or Content Only commands. 
-![note heading demo](images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
+![note heading demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
 
 
 
