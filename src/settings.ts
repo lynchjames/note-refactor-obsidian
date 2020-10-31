@@ -3,8 +3,8 @@ import {
     PluginSettingTab,
     Setting
 } from 'obsidian';
-import MomentDateRegex from 'moment-date-regex';
-import NoteRefactor from 'main';
+import MomentDateRegex from './moment-date-regex';
+import NoteRefactor from './main';
 
 export class NoteRefactorSettings {
     includeFirstLineAsNoteHeading: boolean = false;

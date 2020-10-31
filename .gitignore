@@ -10,3 +10,4 @@ package-lock.json
 main.js
 *.js.map
 note-refactor*.zip
+dist/
