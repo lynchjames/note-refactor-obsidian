@@ -39,7 +39,7 @@ export default class NRDoc {
     
       
       noteContent(firstLine:string, contentArr:string[]): string {
-        if(this.settings.includeFirstLineAsNoteHeading){
+        if(this.settings.includeFirstLineInNote && this.settings.includeFirstLineAsNoteHeading){
           //Replaces any non-word characters whitespace leading the first line to enforce consistent heading format from setting
           const headingRegex = /^[#\s-]*/;
           const headingBaseline = firstLine.replace(headingRegex, '');

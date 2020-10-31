@@ -87,7 +87,7 @@ export enum Location {
             }));
       }
   
-      if(this.plugin.settings.includeFirstLineInNote && this.plugin.settings.includeFirstLineInNote){
+      if(this.plugin.settings.includeFirstLineInNote && this.plugin.settings.includeFirstLineAsNoteHeading){
         new Setting(containerEl)
           .setName('Heading format')
           .setDesc('Set format of the heading to be included in note content')
