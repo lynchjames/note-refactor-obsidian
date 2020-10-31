@@ -3,7 +3,7 @@ import {
   Notice,
   Plugin,
   Setting,
-  Modal
+  Modal, Vault, DataAdapter
 } from 'obsidian';
 import MomentDateRegex from 'moment-date-regex';
 import { NoteRefactorSettings, NoteRefactorSettingsTab, Location } from 'settings';
@@ -11,13 +11,17 @@ import { NoteRefactorSettings, NoteRefactorSettingsTab, Location } from 'setting
 export default class NoteRefactor extends Plugin {
   settings: NoteRefactorSettings;
   momentDateRegex: MomentDateRegex;
+  vault: Vault;
+  vaultAdapter: DataAdapter;
 
   onInit() {}
 
   async onload() {
     console.log("Loading Note Refactor plugin");
     this.settings = (await this.loadData()) || new NoteRefactorSettings();
-    this.momentDateRegex = new MomentDateRegex()
+    this.momentDateRegex = new MomentDateRegex();
+    this.vault = this.app.vault;
+    this.vaultAdapter = this.app.vault.adapter;
     
     this.addCommand({
       id: 'app:extract-selection-first-line',
@@ -157,23 +161,23 @@ export default class NoteRefactor extends Plugin {
   createFile(fileName: string, note: string, postCreateCallback: () => any): void {
     const folderPath = this.filePath();
     const filePath = this.filePathAndFileName(fileName);
-    this.app.vault.adapter.exists(filePath, false).then(exists => {
+    this.vaultAdapter.exists(filePath, false).then(exists => {
       if(exists){
         new Notice(`A file named ${fileName} already exists`);
         return;
       } else {
         //Check if folder exists and create if needed
-        this.app.vault.adapter.exists(folderPath, false).then(folderExists => {
+        this.vaultAdapter.exists(folderPath, false).then(folderExists => {
           if(!folderExists) {
             const folders = folderPath.split('/');
             this.createFoldersFromVaultRoot('', folders, () => {
-              this.app.vault.create(filePath, note).then((newFile) => {
+              this.vault.create(filePath, note).then(() => {
                 postCreateCallback();
               });      
             })
           } else {
             //Otherwise save the file into the existing folder
-            this.app.vault.create(filePath, note).then((newFile) => {
+            this.vault.create(filePath, note).then((newFile) => {
               postCreateCallback();
             });
           }
@@ -188,12 +192,12 @@ export default class NoteRefactor extends Plugin {
       return;
     }
     const newFolderPath = [parentPath, folders[0]].join('/');
-    this.app.vault.adapter.exists(newFolderPath, false).then(folderExists => {
+    this.vaultAdapter.exists(newFolderPath, false).then(folderExists => {
       folders.shift();
       if(folderExists) {
         this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
       } else {
-        this.app.vault.createFolder(newFolderPath).then(newFolder => {
+        this.vault.createFolder(newFolderPath).then(newFolder => {
           this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
         });
       }
@@ -204,7 +208,7 @@ export default class NoteRefactor extends Plugin {
     let path = '';
     switch(this.settings.newFileLocation){
       case Location.VaultFolder:
-        path = this.app.vault.getRoot().path;
+        path = this.vault.getRoot().path;
         break;
       case Location.SameFolder:
         const view = this.app.workspace.activeLeaf.view as MarkdownView;
