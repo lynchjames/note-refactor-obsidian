@@ -1,4 +1,4 @@
-# note-refactor-obsidian
+# Note Refactor
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for extracting the selected portion of a notes into new note. 
 
