@@ -1,22 +1,24 @@
 import {
-  App,
   MarkdownView,
   Notice,
   Plugin,
-  PluginSettingTab,
   Setting,
   Modal
-} from "obsidian";
+} from 'obsidian';
+import MomentDateRegex from 'moment-date-regex';
+import { NoteRefactorSettings, NoteRefactorSettingsTab, Location } from 'settings';
 
 export default class NoteRefactor extends Plugin {
   settings: NoteRefactorSettings;
+  momentDateRegex: MomentDateRegex;
 
   onInit() {}
 
   async onload() {
     console.log("Loading Note Refactor plugin");
     this.settings = (await this.loadData()) || new NoteRefactorSettings();
-
+    this.momentDateRegex = new MomentDateRegex()
+    
     this.addCommand({
       id: 'app:extract-selection-first-line',
       name: 'Extract selection to new note - first line as file name',
@@ -82,18 +84,10 @@ export default class NoteRefactor extends Plugin {
       const [header, ...contentArr] = selectedContent;
 
       const fileName = this.sanitisedFileName(header);
-      //TODO: Use file path settings
-      const filePath = fileName + '.md';
-      this.app.vault.adapter.exists(filePath, false).then((exists) => {
-        if(exists){
-          new Notice(`A file named ${fileName} already exists`);
-          return;
-        } else {
-          this.app.vault.create(filePath, this.noteContent(header, contentArr)).then((newFile) => {
-            this.replaceContent(fileName, doc, split)
-            this.app.workspace.openLinkText(fileName, filePath, true);
-          });
-        }
+      const note = this.noteContent(header, contentArr);
+      this.createFile(fileName, note, () => {
+        this.replaceContent(fileName, doc, split)
+        this.app.workspace.openLinkText(fileName, this.filePath(), true);
       });
   }
 
@@ -159,6 +153,87 @@ export default class NoteRefactor extends Plugin {
     }
     return contentArr.join('\n').trim()
   }
+
+  createFile(fileName: string, note: string, postCreateCallback: () => any): void {
+    const folderPath = this.filePath();
+    const filePath = this.filePathAndFileName(fileName);
+    this.app.vault.adapter.exists(filePath, false).then(exists => {
+      if(exists){
+        new Notice(`A file named ${fileName} already exists`);
+        return;
+      } else {
+        //Check if folder exists and create if needed
+        this.app.vault.adapter.exists(folderPath, false).then(folderExists => {
+          if(!folderExists) {
+            console.log(folderPath);
+            const folders = folderPath.split('/');
+            console.log(folders);
+            this.createFoldersFromVaultRoot('', folders, () => {
+              console.log('R4');
+              this.app.vault.create(filePath, note).then((newFile) => {
+                postCreateCallback();
+                console.log('R5');
+              });      
+            })
+          } else {
+            //Otherwise save the file into the existing folder
+            this.app.vault.create(filePath, note).then((newFile) => {
+              postCreateCallback();
+            });
+          }
+        });
+      }
+    });
+  }
+
+  createFoldersFromVaultRoot(parentPath: string, folders: string[], postCreateCallback: () => any): void {
+    if(folders.length === 0) {
+      console.log('R3');
+      postCreateCallback();
+      return;
+    }
+    const newFolderPath = [parentPath, folders[0]].join('/');
+    console.log('Parent', parentPath);
+    console.log('Recursive..', newFolderPath);
+    this.app.vault.adapter.exists(newFolderPath, false).then(folderExists => {
+      folders.shift();
+      if(folderExists) {
+        console.log('R2');
+        this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
+      } else {
+        console.log('R1');
+        this.app.vault.createFolder(newFolderPath).then(newFolder => {
+          this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
+        });
+      }
+    });
+  }
+
+  filePath() : string {
+    let path = '';
+    console.log(this.settings.newFileLocation);
+    switch(this.settings.newFileLocation){
+      case Location.VaultFolder:
+        console.log('Switch vault');
+        path = this.app.vault.getRoot().path;
+        break;
+      case Location.SameFolder:
+        const view = this.app.workspace.activeLeaf.view as MarkdownView;
+        path = view.file.parent.path;
+        console.log('Switch same folder');
+        break;
+      case Location.SpecifiedFolder:
+        path = this.momentDateRegex.replace(this.settings.customFolder);
+        console.log('Switch custom folder');
+        break;
+    }
+    console.log(path);
+    return path;
+  }
+
+  filePathAndFileName(fileName: string): string {
+    return `${this.filePath()}/${this.sanitisedFileName(fileName)}.md`;
+  }
 }
 
 class FileNameModal extends Modal {
@@ -191,19 +266,10 @@ class FileNameModal extends Modal {
               .setButtonText('Create Note')
               .setCta()
               .onClick(() => {
-                //Sanitising again just in case
-                const filePath = this.plugin.sanitisedFileName(fileName) + '.md';
-                this.app.vault.adapter.exists(filePath, false).then((exists) => {
-                  if(exists){
-                    new Notice(`A file named ${fileName} already exists`);
-                    return;
-                  } else {
-                    this.app.vault.create(filePath, this.content).then((newFile) => {
-                      this.plugin.replaceContent(fileName, this.doc, this.split);
-                      this.app.workspace.openLinkText(fileName, filePath, true);
-                      this.close();
-                    });
-                  }
+                this.plugin.createFile(fileName, this.content, () => {
+                  this.plugin.replaceContent(fileName, this.doc, this.split);
+                  this.app.workspace.openLinkText(fileName, this.plugin.filePath(), true);
+                  this.close();
                 });
               }));
       setting.controlEl.focus();
@@ -212,48 +278,5 @@ class FileNameModal extends Modal {
 	onClose() {
 		const {contentEl} = this;
 		contentEl.empty();
-	}
-}
-
-class NoteRefactorSettings {
-  includeFirstLineAsNoteHeading: boolean = false;
-  headingFormat: string = '#';
-}
-
-class NoteRefactorSettingsTab extends PluginSettingTab {
-  plugin: NoteRefactor;
-  constructor(app: App, plugin: NoteRefactor) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-  
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new Setting(containerEl)
-      .setName('Include Heading')
-      .setDesc('Include first line of selection as note heading')
-      .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
-        .onChange((value) => {
-          this.plugin.settings.includeFirstLineAsNoteHeading = value;
-          this.plugin.saveData(this.plugin.settings);
-          this.display();
-        }));
-
-    if(this.plugin.settings.includeFirstLineAsNoteHeading){
-      new Setting(containerEl)
-        .setName('Heading format')
-        .setDesc('Set format of the heading to be included in note content')
-        .addText((text) =>
-            text
-                .setPlaceholder("# or ##")
-                .setValue(this.plugin.settings.headingFormat)
-                .onChange((value) => {
-                    this.plugin.settings.headingFormat = value;
-                    this.plugin.saveData(this.plugin.settings);
-        }));
-      }
   }
 }
