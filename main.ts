@@ -26,7 +26,7 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-first-line',
       name: 'Extract selection to new note - first line as file name',
-      callback: () => this.editModeGuard(() => this.extractSelectionFirstLine(false)),
+      callback: () => this.editModeGuard(async () => await this.extractSelectionFirstLine(false)),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
@@ -78,7 +78,7 @@ export default class NoteRefactor extends Plugin {
     }
   }
 
-  extractSelectionFirstLine(split:boolean): void {
+  async extractSelectionFirstLine(split:boolean): Promise<void> {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.sourceMode.cmEditor;
       
@@ -89,9 +89,9 @@ export default class NoteRefactor extends Plugin {
 
       const fileName = this.sanitisedFileName(header);
       const note = this.noteContent(header, contentArr);
-      this.createFile(fileName, note, () => {
+      await this.createFile(fileName, note).then(async () => {
         this.replaceContent(fileName, doc, split)
-        this.app.workspace.openLinkText(fileName, this.filePath(), true);
+        await this.app.workspace.openLinkText(fileName, this.filePath(), true);
       });
   }
 
@@ -160,47 +160,42 @@ export default class NoteRefactor extends Plugin {
     return contentArr.join('\n').trim()
   }
 
-  createFile(fileName: string, note: string, postCreateCallback: () => any): void {
+  async createFile(fileName: string, note: string): Promise<void> {
     const folderPath = this.filePath();
     const filePath = this.filePathAndFileName(fileName);
-    this.vaultAdapter.exists(filePath, false).then(exists => {
+    await this.vaultAdapter.exists(filePath, false).then(async exists => {
       if(exists){
         new Notice(`A file named ${fileName} already exists`);
         return;
       } else {
         //Check if folder exists and create if needed
-        this.vaultAdapter.exists(folderPath, false).then(async folderExists => {
+        await this.vaultAdapter.exists(folderPath, false).then(async folderExists => {
           if(!folderExists) {
             const folders = folderPath.split('/');
-            this.createFoldersFromVaultRoot('', folders, () => {
-              this.vault.create(filePath, note).then(() => {
-                postCreateCallback();
-              });      
+            await this.createFoldersFromVaultRoot('', folders).then(async () => {
+              await this.vault.create(filePath, note);      
             })
           } else {
             //Otherwise save the file into the existing folder
-            this.vault.create(filePath, note).then((newFile) => {
-              postCreateCallback();
-            });
+            await this.vault.create(filePath, note);
           }
         });
       }
     });
   }
 
-  createFoldersFromVaultRoot(parentPath: string, folders: string[], postCreateCallback: () => any): void {
+  async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
     if(folders.length === 0) {
-      postCreateCallback();
       return;
     }
-    const newFolderPath = [parentPath, folders[0]].join('/');
-    this.vaultAdapter.exists(newFolderPath, false).then(folderExists => {
+    const newFolderPath = this.normalizePath([parentPath, folders[0]].join('/'));
+    await this.vaultAdapter.exists(newFolderPath, false).then(async folderExists => {
       folders.shift();
       if(folderExists) {
-        this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
+        await this.createFoldersFromVaultRoot(newFolderPath, folders);
       } else {
-        this.vault.createFolder(newFolderPath).then(newFolder => {
-          this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
+        await this.vault.createFolder(newFolderPath).then(async newFolder => {
+          await this.createFoldersFromVaultRoot(newFolderPath, folders)
         });
       }
     });
@@ -220,11 +215,37 @@ export default class NoteRefactor extends Plugin {
         path = this.momentDateRegex.replace(this.settings.customFolder);
         break;
     }
-    return path;
+    return this.normalizePath(path);
   }
 
   filePathAndFileName(fileName: string): string {
-    return `${this.filePath()}/${this.sanitisedFileName(fileName)}.md`;
+    return this.normalizePath(`${this.filePath()}/${this.sanitisedFileName(fileName)}.md`);
+  }
+
+  normalizePath(path: string) : string {
+     // Always use forward slash
+     path = path.replace(/\\/g, '/');
+
+     // Strip start/end slash
+     while (path.startsWith('/') && path !== '/') {
+         path = path.substr(1);
+     }
+     while (path.endsWith('/') && path !== '/') {
+         path = path.substr(0, path.length - 1);
+     }
+     
+     // Use / for root
+     if (path === '') {
+         path = '/';
+     }
+ 
+     path = path
+         // Replace non-breaking spaces with regular spaces
+         .replace('\u00A0', ' ')
+         // Normalize unicode to NFC form
+         .normalize('NFC');
+     
+     return path;
   }
 }
 
@@ -257,13 +278,13 @@ class FileNameModal extends Modal {
             button
               .setButtonText('Create Note')
               .setCta()
-              .onClick(() => {
-                this.plugin.createFile(fileName, this.content, () => {
+              .onClick(async () => {
+                await this.plugin.createFile(fileName, this.content).then(() => {
                   this.plugin.replaceContent(fileName, this.doc, this.split);
                   this.app.workspace.openLinkText(fileName, this.plugin.filePath(), true);
                   this.close();
                 });
-              });
+              }));
       setting.controlEl.getElementsByTagName('input')[0].focus();
     }
 
