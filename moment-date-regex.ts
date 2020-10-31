@@ -3,19 +3,20 @@ export default class MomentDateRegex {
         //A regex to capture multiple matches, each with a target group ({date:YYMMDD}) and date group (YYMMDD)
         const dateRegex = /(?<target>{{date:?(?<date>[^}]*)}})/g;
         const customFolderString = input;
-        //Iterating through the matches to collect them in a single array
+        //Iterate through the matches to collect them in a single array
         const matches = [];
         let match;
         while(match = dateRegex.exec(customFolderString)){
           matches.push(match)
         }
-        //Returns the custom folder setting value if no dates are found
+        //Return the custom folder setting value if no dates are found
         if(!matches || matches.length === 0){
           return input;
         }
         const now = new Date();
-        //Transforms date matches into moment formatted dates
+        //Transform date matches into moment formatted dates
         const formattedDates = matches.map(m => {
+          //Default to YYYYMMDDHHmm if {{date}} is used
           const dateFormat = m.groups.date === '' ? 'YYYYMMDDHHmm' : m.groups.date;
           return [m.groups.target, (window as any)
             .moment(now)
