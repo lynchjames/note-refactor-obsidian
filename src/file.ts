@@ -37,7 +37,7 @@ export default class NRFile {
       }
 
       sanitisedFileName(unsanitisedFilename: string): string {
-        const headerRegex = /[#*"\/\\<>:|]/gim;
+        const headerRegex = /[#*"\/\\<>:|\[\]]/gim;
         return unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
       }
     
