@@ -89,10 +89,9 @@ export default class NoteRefactor extends Plugin {
 
       const fileName = this.sanitisedFileName(header);
       const note = this.noteContent(header, contentArr);
-      await this.createFile(fileName, note).then(async () => {
+      await this.createFile(fileName, note);
         this.replaceContent(fileName, doc, split)
         await this.app.workspace.openLinkText(fileName, this.filePath(), true);
-      });
   }
 
   extractSelectionContentOnly(split:boolean): void {
@@ -163,25 +162,22 @@ export default class NoteRefactor extends Plugin {
   async createFile(fileName: string, note: string): Promise<void> {
     const folderPath = this.filePath();
     const filePath = this.filePathAndFileName(fileName);
-    await this.vaultAdapter.exists(filePath, false).then(async exists => {
+    const exists = await this.vaultAdapter.exists(filePath, false);
       if(exists){
         new Notice(`A file named ${fileName} already exists`);
         return;
       } else {
         //Check if folder exists and create if needed
-        await this.vaultAdapter.exists(folderPath, false).then(async folderExists => {
+        const folderExists = await this.vaultAdapter.exists(folderPath, false);
           if(!folderExists) {
             const folders = folderPath.split('/');
-            await this.createFoldersFromVaultRoot('', folders).then(async () => {
-              await this.vault.create(filePath, note);      
-            })
+            await this.createFoldersFromVaultRoot('', folders);
+            await this.vault.create(filePath, note);      
           } else {
             //Otherwise save the file into the existing folder
             await this.vault.create(filePath, note);
           }
-        });
       }
-    });
   }
 
   async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
@@ -189,16 +185,14 @@ export default class NoteRefactor extends Plugin {
       return;
     }
     const newFolderPath = this.normalizePath([parentPath, folders[0]].join('/'));
-    await this.vaultAdapter.exists(newFolderPath, false).then(async folderExists => {
+    const folderExists = await this.vaultAdapter.exists(newFolderPath, false)
       folders.shift();
       if(folderExists) {
         await this.createFoldersFromVaultRoot(newFolderPath, folders);
       } else {
-        await this.vault.createFolder(newFolderPath).then(async newFolder => {
-          await this.createFoldersFromVaultRoot(newFolderPath, folders)
-        });
+        await this.vault.createFolder(newFolderPath);
+        await this.createFoldersFromVaultRoot(newFolderPath, folders)
       }
-    });
   }
 
   filePath() : string {
@@ -279,11 +273,10 @@ class FileNameModal extends Modal {
               .setButtonText('Create Note')
               .setCta()
               .onClick(async () => {
-                await this.plugin.createFile(fileName, this.content).then(() => {
-                  this.plugin.replaceContent(fileName, this.doc, this.split);
-                  this.app.workspace.openLinkText(fileName, this.plugin.filePath(), true);
-                  this.close();
-                });
+                await this.plugin.createFile(fileName, this.content)
+                this.plugin.replaceContent(fileName, this.doc, this.split);
+                this.app.workspace.openLinkText(fileName, this.plugin.filePath(), true);
+                this.close();
               }));
       setting.controlEl.getElementsByTagName('input')[0].focus();
     }
