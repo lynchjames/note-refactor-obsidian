@@ -52,7 +52,7 @@ export enum Location {
       if(this.plugin.settings.newFileLocation == Location.SpecifiedFolder){
         new Setting(containerEl)
           .setName('Folder for new notes')
-          .setDesc(this.descriptionContent(this.plugin))
+          .setDesc(this.descriptionContent())
           .addTextArea((text) =>
               text
                   .setPlaceholder("Example: folder 1/folder")
@@ -89,7 +89,7 @@ export enum Location {
         }
     }
   
-    descriptionContent(plugin: any): DocumentFragment {
+    descriptionContent(): DocumentFragment {
       const descEl = document.createDocumentFragment();
       descEl.appendText('Newly created notes will appear under this folder.');
       descEl.appendChild(document.createElement('br'));
