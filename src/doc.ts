@@ -46,7 +46,7 @@ export default class NRDoc {
           //Adds formatted heading into content array as first item. 
           //Trimming allows for an empty heading format. 
           contentArr.unshift(`${this.settings.headingFormat} ${headingBaseline}`.trim());
-        } else {
+        } else if(this.settings.includeFirstLineInNote){
           //Adds first line back into content if it is not to be included as a header
           contentArr.unshift(firstLine);
         }

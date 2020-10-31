@@ -21,9 +21,12 @@ export default class FileNameModal extends Modal {
       onOpen() {
       const {contentEl} = this;
       let fileName = '';
-  
+
+      const heading = document.createElement('h1');
+      heading.innerText = 'Create note';
+      contentEl.appendChild(heading)
       const setting = new Setting(contentEl)
-          .setName('New note name')
+          .setName('')
           .addText((text) =>
               text
                 .setPlaceholder('Note name')
@@ -32,13 +35,15 @@ export default class FileNameModal extends Modal {
                 }))
           .addButton((button) => 
               button
-                .setButtonText('Create Note')
+                .setButtonText('Create')
                 .setCta()
                 .onClick(async () => {
-                  await this.file.createFile(fileName, this.content)
-                  this.doc.replaceContent(fileName, this.editor, this.split);
-                  this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
-                  this.close();
+                  const exists = await this.file.createFile(fileName, this.content)
+                  if(!exists) {
+                    this.doc.replaceContent(fileName, this.editor, this.split);
+                    this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
+                    this.close();
+                  }
                 }));
         setting.controlEl.getElementsByTagName('input')[0].focus();
       }

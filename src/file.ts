@@ -67,14 +67,14 @@ export default class NRFile {
          return path;
       }
 
-      async createFile(fileName: string, note: string): Promise<void> {
+      async createFile(fileName: string, note: string): Promise<boolean> {
         const view = this.app;
         const folderPath = this.filePath(view);
         const filePath = this.filePathAndFileName(fileName, view);
         const exists = await this.vault.adapter.exists(filePath, false);
           if(exists){
             new Notice(`A file named ${fileName} already exists`);
-            return;
+            return true;
           } else {
             //Check if folder exists and create if needed
             const folderExists = await this.vault.adapter.exists(folderPath, false);
@@ -86,6 +86,7 @@ export default class NRFile {
                 //Otherwise save the file into the existing folder
                 await this.vault.create(filePath, note);
               }
+              return false;
           }
       }
     

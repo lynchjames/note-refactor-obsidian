@@ -8,6 +8,7 @@ import NoteRefactor from './main';
 
 export class NoteRefactorSettings {
     includeFirstLineAsNoteHeading: boolean = false;
+    includeFirstLineInNote: boolean = false;
     headingFormat: string = '#';
     newFileLocation: Location = Location.VaultFolder;
     customFolder: string = '';
@@ -63,16 +64,28 @@ export enum Location {
                       this.uPop.innerText = this.momentDateRegex.replace(this.plugin.settings.customFolder);
           }));
       }
-  
+
       new Setting(containerEl)
-        .setName('Include Heading')
-        .setDesc('Include first line of selection as note heading')
-        .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
-          .onChange((value) => {
-            this.plugin.settings.includeFirstLineAsNoteHeading = value;
-            this.plugin.saveData(this.plugin.settings);
-            this.display();
-          }));
+      .setName('Include First Line')
+      .setDesc('Include first line of selection in note content')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineInNote)
+        .onChange((value) => {
+          this.plugin.settings.includeFirstLineInNote = value;
+          this.plugin.saveData(this.plugin.settings);
+          this.display();
+        }));
+  
+      if(this.plugin.settings.includeFirstLineInNote) {
+        new Setting(containerEl)
+          .setName('Include Heading')
+          .setDesc('Include first line of selection as note heading')
+          .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
+            .onChange((value) => {
+              this.plugin.settings.includeFirstLineAsNoteHeading = value;
+              this.plugin.saveData(this.plugin.settings);
+              this.display();
+            }));
+      }
   
       if(this.plugin.settings.includeFirstLineAsNoteHeading){
         new Setting(containerEl)

@@ -93,9 +93,11 @@ export default class NoteRefactor extends Plugin {
 
       const fileName = this.NRfile.sanitisedFileName(header);
       const note = this.NRDoc.noteContent(header, contentArr);
-      await this.NRfile.createFile(fileName, note);
-      this.NRDoc.replaceContent(fileName, doc, split)
-      await this.app.workspace.openLinkText(fileName, this.NRfile.filePath(this.app.workspace.activeLeaf.view), true);
+      const exists = await this.NRfile.createFile(fileName, note);
+      if(!exists){
+        this.NRDoc.replaceContent(fileName, doc, split)
+        await this.app.workspace.openLinkText(fileName, this.NRfile.filePath(this.app.workspace.activeLeaf.view), true);
+      }
   }
 
   extractSelectionContentOnly(split:boolean): void {
