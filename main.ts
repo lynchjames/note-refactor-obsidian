@@ -165,14 +165,10 @@ export default class NoteRefactor extends Plugin {
         //Check if folder exists and create if needed
         this.app.vault.adapter.exists(folderPath, false).then(folderExists => {
           if(!folderExists) {
-            console.log(folderPath);
             const folders = folderPath.split('/');
-            console.log(folders);
             this.createFoldersFromVaultRoot('', folders, () => {
-              console.log('R4');
               this.app.vault.create(filePath, note).then((newFile) => {
                 postCreateCallback();
-                console.log('R5');
               });      
             })
           } else {
@@ -188,20 +184,15 @@ export default class NoteRefactor extends Plugin {
 
   createFoldersFromVaultRoot(parentPath: string, folders: string[], postCreateCallback: () => any): void {
     if(folders.length === 0) {
-      console.log('R3');
       postCreateCallback();
       return;
     }
     const newFolderPath = [parentPath, folders[0]].join('/');
-    console.log('Parent', parentPath);
-    console.log('Recursive..', newFolderPath);
     this.app.vault.adapter.exists(newFolderPath, false).then(folderExists => {
       folders.shift();
       if(folderExists) {
-        console.log('R2');
         this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
       } else {
-        console.log('R1');
         this.app.vault.createFolder(newFolderPath).then(newFolder => {
           this.createFoldersFromVaultRoot(newFolderPath, folders, postCreateCallback);
         });
@@ -211,23 +202,18 @@ export default class NoteRefactor extends Plugin {
 
   filePath() : string {
     let path = '';
-    console.log(this.settings.newFileLocation);
     switch(this.settings.newFileLocation){
       case Location.VaultFolder:
-        console.log('Switch vault');
         path = this.app.vault.getRoot().path;
         break;
       case Location.SameFolder:
         const view = this.app.workspace.activeLeaf.view as MarkdownView;
         path = view.file.parent.path;
-        console.log('Switch same folder');
         break;
       case Location.SpecifiedFolder:
         path = this.momentDateRegex.replace(this.settings.customFolder);
-        console.log('Switch custom folder');
         break;
     }
-    console.log(path);
     return path;
   }
 
