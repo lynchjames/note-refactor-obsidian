@@ -112,7 +112,8 @@ export default class NoteRefactor extends Plugin {
 
   selectedContent(doc:CodeMirror.Editor): string[] {
     const selectedText = doc.getSelection()
-    return selectedText.split('\n')
+    const trimmedContent = selectedText.trim();
+    return trimmedContent.split('\n')
   }
 
   noteRemainder(doc:CodeMirror.Editor): string[] {
@@ -120,7 +121,8 @@ export default class NoteRefactor extends Plugin {
     const currentLine = doc.getCursor();
     const endPosition = doc.posFromIndex(doc.getValue().length);
     const content = doc.getRange(currentLine, endPosition);
-    return content.split('\n');
+    const trimmedContent = content.trim();
+    return trimmedContent.split('\n');
   }
 
   removeNoteRemainder(doc:CodeMirror.Editor, text:string): void {
@@ -158,7 +160,7 @@ export default class NoteRefactor extends Plugin {
     return contentArr.join('\n').trim()
   }
 
-  createFile(fileName: string, note: string): Promise<void> {
+  async createFile(fileName: string, note: string): Promise<void> {
     const folderPath = this.filePath();
     const filePath = this.filePathAndFileName(fileName);
     this.vaultAdapter.exists(filePath, false).then(exists => {
@@ -167,25 +169,26 @@ export default class NoteRefactor extends Plugin {
         return Promise.reject;
       } else {
         //Check if folder exists and create if needed
-        this.vaultAdapter.exists(folderPath, false).then(folderExists => {
+        this.vaultAdapter.exists(folderPath, false).then(async folderExists => {
           if(!folderExists) {
             const folders = folderPath.split('/');
-              this.createFoldersFromVaultRoot('', folders).then(() => {
+              await this.createFoldersFromVaultRoot('', folders).then(async () => {
                 this.vault.create(filePath, note);
                 return Promise.resolve();      
               });
           } else {
             //Otherwise save the file into the existing folder
-            this.vault.create(filePath, note);
-            return Promise.resolve();
+            await this.vault.create(filePath, note).then(async () => {
+              return Promise.resolve();
+            });
           }
         });
       }
     });
-    return Promise.reject();
+    return Promise.resolve();
   }
 
-  createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
+  async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
     if(folders.length === 0) {
       return Promise.resolve();
     }
@@ -255,12 +258,16 @@ class FileNameModal extends Modal {
               .setCta()
               .onClick(() => {
                 this.plugin.createFile(fileName, this.content).then(() => {
-                  this.plugin.replaceContent(fileName, this.doc, this.split);
-                  this.app.workspace.openLinkText(fileName, this.plugin.filePath(), true);
-                  this.close();
+                  try {
+                    this.plugin.replaceContent(fileName, this.doc, this.split);
+                    this.app.workspace.openLinkText(fileName, this.plugin.filePathAndFileName(fileName), true);
+                    this.close();
+                  } catch (error) {
+                    console.error(error);
+                  }
                 });
               }));
-      setting.controlEl.focus();
+      setting.controlEl.getElementsByTagName('input')[0].focus();
     }
 
 	onClose() {
