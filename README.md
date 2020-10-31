@@ -43,6 +43,27 @@ This command only copies the selected text into the content of a new note. The u
 
 ## Configuration
 
+![plugin settings](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/plugin-settings.png)
+
+### Default location for new notes
+The location for new notes to be saved as a plugin config setting in line with the Obsidian core `Default location for new notes` setting. 
+
+3 options available:
+
+1. Vault folder
+1. Same folder as current file
+1. Specified folder
+
+The specified folder option allows you to specify a folder path for new notes which can include multiple datetime formats.
+
+An example:
+A folder path set as `Zettels/{{date:YYYY}}/{{date:MMMM}}` will add a new file to the following folder structure:
+
+- [Vault]
+  - Zettels
+    - 2020
+      - October
+
 ### First Line included as Note Heading
 A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
 
