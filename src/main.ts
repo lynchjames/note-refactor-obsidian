@@ -5,7 +5,8 @@ import {
   DataAdapter
 } from 'obsidian';
 import MomentDateRegex from './moment-date-regex';
-import { NoteRefactorSettings, NoteRefactorSettingsTab } from './settings';
+import { NoteRefactorSettingsTab } from './settings-tab';
+import { NoteRefactorSettings } from './settings';
 import NRFile from './file';
 import NRDoc from './doc';
 import FileNameModal from './modal';
