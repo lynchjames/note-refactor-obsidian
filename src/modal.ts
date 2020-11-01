@@ -9,7 +9,9 @@ export default class FileNameModal extends Modal {
     file: NRFile;
     editor: Editor;
     split: boolean;
-      constructor(app: App, doc :NRDoc, file:NRFile, content: string, editor: CodeMirror.Editor, split: boolean) {
+    fileNameInput: HTMLInputElement;
+    
+    constructor(app: App, doc :NRDoc, file:NRFile, content: string, editor: CodeMirror.Editor, split: boolean) {
       super(app);
       this.content = content;
       this.doc = doc;
@@ -17,7 +19,7 @@ export default class FileNameModal extends Modal {
       this.editor = editor;
       this.split = split;
     }
-  
+
       onOpen() {
       const {contentEl} = this;
       let fileName = '';
@@ -38,14 +40,33 @@ export default class FileNameModal extends Modal {
                 .setButtonText('Create')
                 .setCta()
                 .onClick(async () => {
-                  const exists = await this.file.createFile(fileName, this.content)
-                  if(!exists) {
-                    this.doc.replaceContent(fileName, this.editor, this.split);
-                    this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
-                    this.close();
-                  }
+                  await this.submitModal(fileName);
                 }));
-        setting.controlEl.getElementsByTagName('input')[0].focus();
+        this.fileNameInput = setting.controlEl.children[0] as HTMLInputElement;
+        this.fileNameInput.addEventListener('keypress', (e) => this.handleKeyUp(this.fileNameInput, e));
+        this.fileNameInput.focus();
+      }
+
+      async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
+        if(event.key === 'Enter'){
+          console.log('Enter key pressed');
+          const fileName = input.value;
+          const exists = await this.file.createFile(fileName, this.content)
+          if(!exists) {
+            this.doc.replaceContent(fileName, this.editor, this.split);
+            this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
+            this.close();
+          }
+        }
+      }
+
+      async submitModal(fileName: string) : Promise<void> {
+        const exists = await this.file.createFile(fileName, this.content)
+        if(!exists) {
+          this.doc.replaceContent(fileName, this.editor, this.split);
+          this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
+          this.close();
+        }
       }
   
       onClose() {
