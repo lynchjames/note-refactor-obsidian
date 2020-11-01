@@ -6,6 +6,8 @@ on:
         - master
   push:
     # Sequence of patterns matched against refs/tags
+    branches:
+      - feature/*
     tags:
     - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
