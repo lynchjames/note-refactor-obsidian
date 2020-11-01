@@ -28,7 +28,7 @@ describe("Date formatting", () => {
         assert.equal(momentRegex.replace(input, date), expectedOuput);
     });
 
-    it("Date prefixing", () => {
+    it("Date path prefixing", () => {
         const input = '{{date:YYYY}}/{{date:MM}}/My Notes';
         const expectedOuput = '2020/10/My Notes';
         
@@ -38,6 +38,13 @@ describe("Date formatting", () => {
     it("Text between date targets", () => {
         const input = '{{date:YYYY}}/Zettels/{{date:MMMM}}';
         const expectedOuput = '2020/Zettels/October';
+        
+        assert.equal(momentRegex.replace(input, date), expectedOuput);
+    });
+
+    it("Date file name prefixing", () => {
+        const input = '{{date:YYYYMMDDHHmm}}-My New Note';
+        const expectedOuput = '202010311425-My New Note';
         
         assert.equal(momentRegex.replace(input, date), expectedOuput);
     });

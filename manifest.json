@@ -1,8 +1,9 @@
 {
   "id": "note-refactor-obsidian",
   "name": "Note Refactor",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Extract note content into new notes and split notes",
   "isDesktopOnly": false,
-  "js": "main.js"
+  "js": "main.js",
+  "css": "style.css"
 }

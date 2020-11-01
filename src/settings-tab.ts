@@ -8,7 +8,8 @@ import MomentDateRegex from './moment-date-regex';
 import NoteRefactor from './main';
   
   export class NoteRefactorSettingsTab extends PluginSettingTab {
-    uPop = document.createElement('b');
+    folderUPop = document.createElement('b');
+    filePrefixUPop = document.createElement('b');
     momentDateRegex = new MomentDateRegex();
     plugin: NoteRefactor;
     constructor(app: App, plugin: NoteRefactor) {
@@ -20,7 +21,7 @@ import NoteRefactor from './main';
       const { containerEl } = this;
   
       containerEl.empty();
-      this.uPop.className = 'u-pop';
+      this.folderUPop.className = this.filePrefixUPop.className = 'u-pop';
   
       new Setting(containerEl)
         .setName('Default location for new notes')
@@ -40,7 +41,7 @@ import NoteRefactor from './main';
       if(this.plugin.settings.newFileLocation == Location.SpecifiedFolder){
         new Setting(containerEl)
           .setName('Folder for new notes')
-          .setDesc(this.descriptionContent())
+          .setDesc(this.folderDescriptionContent())
           .addTextArea((text) =>
               text
                   .setPlaceholder("Example: folder 1/folder")
@@ -48,9 +49,22 @@ import NoteRefactor from './main';
                   .onChange((value) => {
                       this.plugin.settings.customFolder = value;
                       this.plugin.saveData(this.plugin.settings);
-                      this.uPop.innerText = this.momentDateRegex.replace(this.plugin.settings.customFolder);
+                      this.updateFolderUPop();
           }));
       }
+
+      new Setting(containerEl)
+      .setName('File name prefix')
+      .setDesc(this.filenamePrefixDescriptionContent())
+      .addTextArea((text) =>
+          text
+              .setPlaceholder("Example: {{date:YYYYMMDDHHmm}}-")
+              .setValue(this.plugin.settings.fileNamePrefix)
+              .onChange((value) => {
+                  this.plugin.settings.fileNamePrefix = value;
+                  this.plugin.saveData(this.plugin.settings);
+                  this.updateFileNamePrefixUPop();
+      }));
 
       new Setting(containerEl)
       .setName('Exclude First Line')
@@ -87,23 +101,54 @@ import NoteRefactor from './main';
         }
     }
   
-    descriptionContent(): DocumentFragment {
+    private folderDescriptionContent(): DocumentFragment {
       const descEl = document.createDocumentFragment();
       descEl.appendText('Newly created notes will appear under this folder.');
       descEl.appendChild(document.createElement('br'));
-      descEl.appendText('Date formats are supported {{date:YYYYMMDD}} and used with current date when note is created.');
+      descEl.appendText('For more syntax, refer to ');
+      this.dateFormattingDescription(descEl);
+      descEl.appendText('Your current folder path syntax looks like this:');
+      descEl.appendChild(document.createElement('br'));
+      this.updateFolderUPop()
+      descEl.appendChild(this.folderUPop);
+      return descEl;
+    }
+    
+    private updateFolderUPop() {
+      this.folderUPop.innerText = this.momentDateRegex.replace(this.plugin.settings.customFolder);
+    }
+
+    private filenamePrefixDescriptionContent(): DocumentFragment {
+      const descEl = document.createDocumentFragment();
+      descEl.appendText('Newly created notes will have this prefix');
+      descEl.appendChild(document.createElement('br'));
+      this.dateFormattingDescription(descEl);
+      descEl.appendText('Your current file name prefix syntax looks like this:');
+      descEl.appendChild(document.createElement('br'));
+      this.updateFileNamePrefixUPop();
+      descEl.appendChild(this.filePrefixUPop);
+      return descEl;
+    }
+
+    private dateFormattingDescription(descEl: DocumentFragment) {
+      descEl.appendText('Date formats are supported {{date:YYYYMMDDHHmm}}');
+      descEl.appendChild(document.createElement('br'));
+      descEl.appendText('and used with current date and time when note is created.');
       descEl.appendChild(document.createElement('br'));
       descEl.appendText('For more syntax, refer to ');
+      this.addMomentDocsLink(descEl);
+    }
+
+    private updateFileNamePrefixUPop() {
+      this.filePrefixUPop.innerText = this.momentDateRegex.replace(this.plugin.settings.fileNamePrefix);
+    }
+
+    private addMomentDocsLink(descEl: DocumentFragment) {
       const a = document.createElement('a');
       a.href = 'https://momentjs.com/docs/#/displaying/format/';
       a.text = 'format reference';
       a.target = '_blank';
       descEl.appendChild(a);
       descEl.appendChild(document.createElement('br'));
-      descEl.appendText('Your current folder path syntax looks like this:');
-      descEl.appendChild(document.createElement('br'));
-      this.uPop.innerText = this.momentDateRegex.replace(this.plugin.settings.customFolder);
-      descEl.appendChild(this.uPop);
-      return descEl;
     }
   }

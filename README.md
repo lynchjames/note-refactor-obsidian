@@ -72,13 +72,23 @@ The location for new notes to be saved as a plugin config setting in line with t
 
 The specified folder option allows you to specify a folder path for new notes which can include multiple datetime formats.
 
-An example:
+**Example**
+
 A folder path set as `Zettels/{{date:YYYY}}/{{date:MMMM}}` will add a new file to the following folder structure:
 
 - [Vault]
   - Zettels
     - 2020
       - October
+
+### File Name Prefix
+The file name prefix option allows you to specify a prefix for new notes which can include multiple datetime formats.
+
+**Example**
+
+A prefix set as `{{date:YYYYMMDDHHmm}}-` will add a new file with the following file name:
+
+`202010311425-My New Note`
 
 ### First Line included as Note Heading
 A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.

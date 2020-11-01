@@ -4,6 +4,7 @@ export class NoteRefactorSettings {
     headingFormat: string = '#';
     newFileLocation: Location = Location.VaultFolder;
     customFolder: string = '';
+    fileNamePrefix: string = '';
   }
   
 export enum Location {

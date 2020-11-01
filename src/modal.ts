@@ -28,7 +28,8 @@ export default class FileNameModal extends Modal {
       heading.innerText = 'Create note';
       contentEl.appendChild(heading)
       const setting = new Setting(contentEl)
-          .setName('')
+          .setName(this.file.fileNamePrefix())
+          .setClass('note-refactor-filename')
           .addText((text) =>
               text
                 .setPlaceholder('Note name')
@@ -40,16 +41,16 @@ export default class FileNameModal extends Modal {
                 .setButtonText('Create')
                 .setCta()
                 .onClick(async () => {
-                  await this.submitModal(fileName);
+                  await this.submitModal(this.file.sanitisedFileName(fileName));
                 }));
         this.fileNameInput = setting.controlEl.children[0] as HTMLInputElement;
         this.fileNameInput.addEventListener('keypress', (e) => this.handleKeyUp(this.fileNameInput, e));
         this.fileNameInput.focus();
       }
 
-      async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
+      private async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
-          const fileName = input.value;
+          const fileName = this.file.sanitisedFileName(input.value);
           const exists = await this.file.createFile(fileName, this.content)
           if(!exists) {
             this.doc.replaceContent(fileName, this.editor, this.split);
@@ -59,7 +60,7 @@ export default class FileNameModal extends Modal {
         }
       }
 
-      async submitModal(fileName: string) : Promise<void> {
+      private async submitModal(fileName: string) : Promise<void> {
         const exists = await this.file.createFile(fileName, this.content)
         if(!exists) {
           this.doc.replaceContent(fileName, this.editor, this.split);

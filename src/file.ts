@@ -33,12 +33,16 @@ export default class NRFile {
       }
     
       filePathAndFileName(fileName: string, view: any): string {
-        return this.normalizePath(`${this.filePath(view)}/${this.sanitisedFileName(fileName)}.md`);
+        return this.normalizePath(`${this.filePath(view)}/${fileName}.md`);
       }
 
       sanitisedFileName(unsanitisedFilename: string): string {
         const headerRegex = /[#*"\/\\<>:|\[\]]/gim;
-        return unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
+        return this.fileNamePrefix() + unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
+      }
+
+      fileNamePrefix(): string {
+        return this.settings.fileNamePrefix ? this.momentDateRegex.replace(this.settings.fileNamePrefix) : '';
       }
     
       normalizePath(path: string) : string {
@@ -71,6 +75,7 @@ export default class NRFile {
         const view = this.app;
         const folderPath = this.filePath(view);
         const filePath = this.filePathAndFileName(fileName, view);
+        console.log('File path in create file', filePath);
         const exists = await this.vault.adapter.exists(filePath, false);
           if(exists){
             new Notice(`A file named ${fileName} already exists`);
