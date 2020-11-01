@@ -18,6 +18,22 @@ The new note file is created at the root of the vault with the filename as the f
 
 Headings (`#`) characters and other illegal characters for filenames are removed including `:`, `\`, `/`.
 
+## Usage
+This table shows the different use cases for this plugin and how commands and settings can be used in each case.
+
+| Use case                                                      | Command                          | Plugin Settings                         |
+| --------------------------------------------------------------| -------------------------------- | -------------------------------- |
+| **Extracting** | |
+| 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note provided by the user. | Extract selection to new note - content only | **Include Heading**<br />False |
+| 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note set from the first line of the selection | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />False |
+| 1. Extract a selection into a new note.<br />2. File name for new note set from the first line of the selection.<br />3. First line included in the new note as a heading. | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />True |
+| 1. Extract a selection into a new note<br />2. File name for new note set from the first line of the selection.<br />3. First line not being included in the new note. | Extract selection to new note - first line as file name | **Exclude First Line**<br />True <br/><br /> |
+| **Splitting** | |
+| 1. Split a note from the current line of the cursor into new note exactly as it is.<br />2. File name for new note provided by the user. | Split note here - content only | **Include Heading**<br/>False |
+| 1. Split a note from the current line of the cursor into new note.<br />2. File name for new note provided by the user.<br />3. First included in the new note as a heading. | Split note here - content only | **Include Heading**<br/>True |
+| 1. Split a note from the current line of the cursor into a new note<br />2. File name for new note set from the first line of the selection.<br />3. First line included in the new note as a heading. | Split note here - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />True |
+| 1. Split a note from the current line of the cursor into new note exactly as it is.<br />2. File name for new note set from the first line of the selection. | Extract selection to new note - first line as file name | **Include Heading**<br />False |
+
 ## Commands
 
 ### Note Splitting
@@ -70,13 +86,11 @@ A config setting allows for the first line of the selected text to be included i
 This setting is applied for either the First Line filename or Content Only commands. 
 ![note heading demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
 
-
-
 ## Compatibility
 
 Custom plugins are only available for Obsidian v0.9.7+.
 
-The current API of this repo targets Obsidian **v0.9.7**. 
+The current API of this repo targets Obsidian **v0.9.10**. 
 
 ## Installing
 

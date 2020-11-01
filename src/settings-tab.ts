@@ -64,7 +64,7 @@ import NoteRefactor from './main';
   
         new Setting(containerEl)
           .setName('Include Heading')
-          .setDesc('Include first line of selection as note heading (applies for both first line as title and content only commands)')
+          .setDesc('Include first line of selected/split note content as note heading (applies for both first line as title and content only commands)')
           .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
             .onChange((value) => {
               this.plugin.settings.includeFirstLineAsNoteHeading = value;
