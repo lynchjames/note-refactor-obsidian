@@ -42,16 +42,16 @@ export default class NRDoc {
     }
   
     
-    noteContent(firstLine:string, contentArr:string[]): string {
-      if(this.settings.includeFirstLineInNote && this.settings.includeFirstLineAsNoteHeading){
+    noteContent(firstLine:string, contentArr:string[], contentOnly?:boolean): string {
+      if(this.settings.includeFirstLineAsNoteHeading){
         //Replaces any non-word characters whitespace leading the first line to enforce consistent heading format from setting
         const headingRegex = /^[#\s-]*/;
         const headingBaseline = firstLine.replace(headingRegex, '');
         //Adds formatted heading into content array as first item. 
         //Trimming allows for an empty heading format. 
         contentArr.unshift(`${this.settings.headingFormat} ${headingBaseline}`.trim());
-      } else if(this.settings.includeFirstLineInNote){
-        //Adds first line back into content if it is not to be included as a header
+      } else if(!this.settings.excludeFirstLineInNote || contentOnly){
+        //Adds first line back into content if it is not to be included as a header or if the command is content only
         contentArr.unshift(firstLine);
       }
       return contentArr.join('\n').trim()

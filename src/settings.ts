@@ -1,6 +1,6 @@
 export class NoteRefactorSettings {
     includeFirstLineAsNoteHeading: boolean = false;
-    includeFirstLineInNote: boolean = false;
+    excludeFirstLineInNote: boolean = false;
     headingFormat: string = '#';
     newFileLocation: Location = Location.VaultFolder;
     customFolder: string = '';

@@ -13,8 +13,8 @@ describe("Note Refactor Settings defaults", () => {
         assert.equal(settings.customFolder, '');
     });
 
-    it("Include first line in note", () => {
-        assert.isFalse(settings.includeFirstLineInNote);
+    it("Exclude first line in note", () => {
+        assert.isFalse(settings.excludeFirstLineInNote);
     });
 
     it("Include first line as note heading", () => {

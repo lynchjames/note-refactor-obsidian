@@ -53,28 +53,26 @@ import NoteRefactor from './main';
       }
 
       new Setting(containerEl)
-      .setName('Include First Line')
-      .setDesc('Include first line of selection in note content')
-      .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineInNote)
+      .setName('Exclude First Line')
+      .setDesc('Prevent the first line of selected/split note content from being included in the new note (only applies for first line as file name commands)')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.excludeFirstLineInNote)
         .onChange((value) => {
-          this.plugin.settings.includeFirstLineInNote = value;
+          this.plugin.settings.excludeFirstLineInNote = value;
           this.plugin.saveData(this.plugin.settings);
           this.display();
         }));
   
-      if(this.plugin.settings.includeFirstLineInNote) {
         new Setting(containerEl)
           .setName('Include Heading')
-          .setDesc('Include first line of selection as note heading')
+          .setDesc('Include first line of selection as note heading (applies for both first line as title and content only commands)')
           .addToggle(toggle => toggle.setValue(this.plugin.settings.includeFirstLineAsNoteHeading)
             .onChange((value) => {
               this.plugin.settings.includeFirstLineAsNoteHeading = value;
               this.plugin.saveData(this.plugin.settings);
               this.display();
             }));
-      }
   
-      if(this.plugin.settings.includeFirstLineInNote && this.plugin.settings.includeFirstLineAsNoteHeading){
+      if(this.plugin.settings.includeFirstLineAsNoteHeading){
         new Setting(containerEl)
           .setName('Heading format')
           .setDesc('Set format of the heading to be included in note content')

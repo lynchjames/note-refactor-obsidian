@@ -112,6 +112,6 @@ export default class NoteRefactor extends Plugin {
   }
   
   loadModal(contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
-    new FileNameModal(this.app, this.NRDoc, this.NRfile, this.NRDoc.noteContent(contentArr[0], contentArr.slice(1)), doc, split).open();
+    new FileNameModal(this.app, this.NRDoc, this.NRfile, this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true), doc, split).open();
   }
 }
