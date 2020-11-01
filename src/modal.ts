@@ -49,7 +49,6 @@ export default class FileNameModal extends Modal {
 
       async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
-          console.log('Enter key pressed');
           const fileName = input.value;
           const exists = await this.file.createFile(fileName, this.content)
           if(!exists) {
