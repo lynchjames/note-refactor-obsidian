@@ -1,4 +1,4 @@
-name: Build obsidian plugin
+name: Test obsidian plugin
 
 on:
   pull_request:
