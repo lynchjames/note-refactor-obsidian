@@ -1,0 +1,39 @@
+name: Test obsidian plugin
+
+on:
+  pull_request:
+      branches:
+        - master
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
+
+env:
+  PLUGIN_NAME: note-refactor-obsidian # Change this to the name of your plugin-id folder
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x' # You might need to adjust this value to your own version
+    - name: Build
+      id: build
+      run: | 
+        npm install
+        npm run build --if-present
+        mkdir ${{ env.PLUGIN_NAME }}
+        cp dist/main.js manifest.json ${{ env.PLUGIN_NAME }}
+        zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+        ls
+        echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
+    - name: Test
+      id: test
+      run: |
+        npm run test
