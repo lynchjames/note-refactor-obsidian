@@ -59,7 +59,7 @@ import NoteRefactor from './main';
       .addTextArea((text) =>
           text
               .setPlaceholder("Example: {{date:YYYYMMDDHHmm}}-")
-              .setValue(this.plugin.settings.fileNamePrefix)
+              .setValue(this.plugin.settings.fileNamePrefix || '')
               .onChange((value) => {
                   this.plugin.settings.fileNamePrefix = value;
                   this.plugin.saveData(this.plugin.settings);
