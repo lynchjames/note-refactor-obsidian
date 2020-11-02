@@ -1,112 +1,47 @@
-import { App, MarkdownView, Notice, Vault } from 'obsidian';
-import { NoteRefactorSettings, Location } from './settings';
+import { NoteRefactorSettings } from './settings';
 import MomentDateRegex from './moment-date-regex'
 
 export default class NRFile {
     settings: NoteRefactorSettings;
-    vault: Vault;
     momentDateRegex: MomentDateRegex;
-    view: MarkdownView;
-    app: App;
 
-    constructor(setting: NoteRefactorSettings, app: App) {
+    constructor(setting: NoteRefactorSettings) {
         this.settings = setting;
-        this.app = app;
-        this.vault = app.vault;
         this.momentDateRegex = new MomentDateRegex();
     }
 
-    filePath(view: any) : string {
-        let path = '';
-        switch(this.settings.newFileLocation){
-          case Location.VaultFolder:
-            path = this.vault.getRoot().path;
-            break;
-          case Location.SameFolder:
-            path = this.view.file.parent.path;
-            break;
-          case Location.SpecifiedFolder:
-            path = this.momentDateRegex.replace(this.settings.customFolder);
-            break;
+    sanitisedFileName(unsanitisedFilename: string): string {
+      const headerRegex = /[#*"\/\\<>:|\[\]]/gim;
+      return this.fileNamePrefix() + unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
+    }
+
+    fileNamePrefix(): string {
+      return this.settings.fileNamePrefix ? this.momentDateRegex.replace(this.settings.fileNamePrefix) : '';
+    }
+  
+    normalizePath(path: string) : string {
+        // Always use forward slash
+        path = path.replace(/\\/g, '/');
+  
+        // Strip start/end slash
+        while (path.startsWith('/') && path !== '/') {
+            path = path.substr(1);
         }
-        return this.normalizePath(path);
-      }
-    
-      filePathAndFileName(fileName: string, view: any): string {
-        return this.normalizePath(`${this.filePath(view)}/${fileName}.md`);
-      }
-
-      sanitisedFileName(unsanitisedFilename: string): string {
-        const headerRegex = /[#*"\/\\<>:|\[\]]/gim;
-        return this.fileNamePrefix() + unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
-      }
-
-      fileNamePrefix(): string {
-        return this.settings.fileNamePrefix ? this.momentDateRegex.replace(this.settings.fileNamePrefix) : '';
-      }
-    
-      normalizePath(path: string) : string {
-         // Always use forward slash
-         path = path.replace(/\\/g, '/');
-    
-         // Strip start/end slash
-         while (path.startsWith('/') && path !== '/') {
-             path = path.substr(1);
-         }
-         while (path.endsWith('/') && path !== '/') {
-             path = path.substr(0, path.length - 1);
-         }
-         
-         // Use / for root
-         if (path === '') {
-             path = '/';
-         }
-     
-         path = path
-             // Replace non-breaking spaces with regular spaces
-             .replace('\u00A0', ' ')
-             // Normalize unicode to NFC form
-             .normalize('NFC');
-         
-         return path;
-      }
-
-      async createFile(fileName: string, note: string): Promise<boolean> {
-        const view = this.app;
-        const folderPath = this.filePath(view);
-        const filePath = this.filePathAndFileName(fileName, view);
-        console.log('File path in create file', filePath);
-        const exists = await this.vault.adapter.exists(filePath, false);
-          if(exists){
-            new Notice(`A file named ${fileName} already exists`);
-            return true;
-          } else {
-            //Check if folder exists and create if needed
-            const folderExists = await this.vault.adapter.exists(folderPath, false);
-              if(!folderExists) {
-                const folders = folderPath.split('/');
-                await this.createFoldersFromVaultRoot('', folders);
-                await this.vault.create(filePath, note);      
-              } else {
-                //Otherwise save the file into the existing folder
-                await this.vault.create(filePath, note);
-              }
-              return false;
-          }
-      }
-    
-      async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
-        if(folders.length === 0) {
-          return;
+        while (path.endsWith('/') && path !== '/') {
+            path = path.substr(0, path.length - 1);
         }
-        const newFolderPath = this.normalizePath([parentPath, folders[0]].join('/'));
-        const folderExists = await this.vault.adapter.exists(newFolderPath, false)
-          folders.shift();
-          if(folderExists) {
-            await this.createFoldersFromVaultRoot(newFolderPath, folders);
-          } else {
-            await this.vault.createFolder(newFolderPath);
-            await this.createFoldersFromVaultRoot(newFolderPath, folders)
-          }
-      }
+        
+        // Use / for root
+        if (path === '') {
+            path = '/';
+        }
+    
+        path = path
+            // Replace non-breaking spaces with regular spaces
+            .replace('\u00A0', ' ')
+            // Normalize unicode to NFC form
+            .normalize('NFC');
+        
+        return path;
+    }
 }

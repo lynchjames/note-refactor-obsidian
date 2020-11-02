@@ -8,13 +8,15 @@ import MomentDateRegex from './moment-date-regex';
 import { NoteRefactorSettingsTab } from './settings-tab';
 import { NoteRefactorSettings } from './settings';
 import NRFile from './file';
+import ObsidianFile from './obsidian-file';
 import NRDoc from './doc';
 import FileNameModal from './modal';
 
 export default class NoteRefactor extends Plugin {
   settings: NoteRefactorSettings;
   momentDateRegex: MomentDateRegex;
-  NRfile: NRFile;
+  obsFile: ObsidianFile;
+  file: NRFile;
   NRDoc: NRDoc;
   vault: Vault;
   vaultAdapter: DataAdapter;
@@ -25,7 +27,8 @@ export default class NoteRefactor extends Plugin {
     console.log("Loading Note Refactor plugin");
     this.settings = (await this.loadData()) || new NoteRefactorSettings();
     this.momentDateRegex = new MomentDateRegex();
-    this.NRfile = new NRFile(this.settings, this.app)
+    this.obsFile = new ObsidianFile(this.settings, this.app)
+    this.file = new NRFile(this.settings);
     this.NRDoc = new NRDoc(this.settings);
     
     this.addCommand({
@@ -92,12 +95,12 @@ export default class NoteRefactor extends Plugin {
 
       const [header, ...contentArr] = selectedContent;
 
-      const fileName = this.NRfile.sanitisedFileName(header);
+      const fileName = this.file.sanitisedFileName(header);
       const note = this.NRDoc.noteContent(header, contentArr);
-      const exists = await this.NRfile.createFile(fileName, note);
+      const exists = await this.obsFile.createFile(fileName, note);
       if(!exists){
         this.NRDoc.replaceContent(fileName, doc, split)
-        await this.app.workspace.openLinkText(fileName, this.NRfile.filePath(this.app.workspace.activeLeaf.view), true);
+        await this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
       }
   }
 
@@ -112,6 +115,6 @@ export default class NoteRefactor extends Plugin {
   }
   
   loadModal(contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
-    new FileNameModal(this.app, this.NRDoc, this.NRfile, this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true), doc, split).open();
+    new FileNameModal(this.app, this.NRDoc, this.file, this.obsFile, this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true), doc, split).open();
   }
 }

@@ -2,19 +2,22 @@ import NRDoc from './doc';
 import NRFile from './file';
 import { App, Modal, Setting } from 'obsidian';
 import { Editor } from 'codemirror';
+import ObsidianFile from './obsidian-file';
 
 export default class FileNameModal extends Modal {
     content: string;
     doc: NRDoc;
-    file: NRFile;
+    obsFile: ObsidianFile;
+    file: NRFile
     editor: Editor;
     split: boolean;
     fileNameInput: HTMLInputElement;
     
-    constructor(app: App, doc :NRDoc, file:NRFile, content: string, editor: CodeMirror.Editor, split: boolean) {
+    constructor(app: App, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, split: boolean) {
       super(app);
       this.content = content;
       this.doc = doc;
+      this.obsFile = obsFile;
       this.file = file;
       this.editor = editor;
       this.split = split;
@@ -51,20 +54,20 @@ export default class FileNameModal extends Modal {
       private async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
           const fileName = this.file.sanitisedFileName(input.value);
-          const exists = await this.file.createFile(fileName, this.content)
+          const exists = await this.obsFile.createFile(fileName, this.content)
           if(!exists) {
             this.doc.replaceContent(fileName, this.editor, this.split);
-            this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
+            this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
             this.close();
           }
         }
       }
 
       private async submitModal(fileName: string) : Promise<void> {
-        const exists = await this.file.createFile(fileName, this.content)
+        const exists = await this.obsFile.createFile(fileName, this.content)
         if(!exists) {
           this.doc.replaceContent(fileName, this.editor, this.split);
-          this.app.workspace.openLinkText(fileName, this.file.filePath(this.app.workspace.activeLeaf.view), true);
+          this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
           this.close();
         }
       }

@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 export default class MomentDateRegex {
-    replace(input: string, date?: Date): string {
+    replace(input: string): string {
         //A regex to capture multiple matches, each with a target group ({date:YYMMDD}) and date group (YYMMDD)
         const dateRegex = /(?<target>{{date:?(?<date>[^}]*)}})/g;
         const customFolderString = input;
@@ -11,11 +11,11 @@ export default class MomentDateRegex {
         while(match = dateRegex.exec(customFolderString)){
           matches.push(match)
         }
-        //Return the cust om folder setting value if no dates are found
+        //Return the custom folder setting value if no dates are found
         if(!matches || matches.length === 0){
           return input;
         }
-        const now = date ?? new Date();
+        const now = new Date();
         //Transform date matches into moment formatted dates
         const formattedDates = matches.map(m => {
           //Default to YYYYMMDDHHmm if {{date}} is used
