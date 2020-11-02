@@ -1,9 +1,6 @@
 name: Build obsidian plugin
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
     # Sequence of patterns matched against refs/tags
     tags:
