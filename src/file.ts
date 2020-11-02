@@ -2,8 +2,8 @@ import { NoteRefactorSettings } from './settings';
 import MomentDateRegex from './moment-date-regex'
 
 export default class NRFile {
-    settings: NoteRefactorSettings;
-    momentDateRegex: MomentDateRegex;
+    private settings: NoteRefactorSettings;
+    private momentDateRegex: MomentDateRegex;
 
     constructor(setting: NoteRefactorSettings) {
         this.settings = setting;

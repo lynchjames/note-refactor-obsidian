@@ -4,12 +4,12 @@ import MomentDateRegex from './moment-date-regex'
 import NRFile from './file';
 
 export default class ObsidianFile {
-    settings: NoteRefactorSettings;
-    vault: Vault;
-    view: MarkdownView;
-    app: App;
-    file: NRFile;
-    momentDateRegex: MomentDateRegex;
+    private settings: NoteRefactorSettings;
+    private vault: Vault;
+    private view: MarkdownView;
+    private app: App;
+    private file: NRFile;
+    private momentDateRegex: MomentDateRegex;
 
     constructor(setting: NoteRefactorSettings, app: App) {
         this.settings = setting;

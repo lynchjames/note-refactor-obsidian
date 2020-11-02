@@ -3,9 +3,8 @@ import { assert } from 'chai';
 import NRDoc from '../src/doc';
 import { NoteRefactorSettings } from '../src/settings';
 import { promises as fs } from 'fs';
-const settings = new NoteRefactorSettings();
 const newLocal = './tests/files/test-note.md';
-const doc = new NRDoc(settings);
+let doc: NRDoc = null;
 let fileContents:string = '';
 let content: string[] = [];
 
@@ -14,7 +13,7 @@ describe("Note content - Content Only", () => {
     before(async () => {
         fileContents = await loadTestFile();
         content = toArray(fileContents, 0, 15);
-        doc.settings = new NoteRefactorSettings();
+        doc = new NRDoc(new NoteRefactorSettings());
     });
 
     it("First line content", () => {
@@ -32,16 +31,15 @@ describe("Note content - Content Only", () => {
         assert.equal(noteContent.length, 746);
     });
 
-    after(() => {
-        doc.settings = new NoteRefactorSettings();
-    });
 });
 
 describe("Note content - First Line as File Name, exclude first line", () => {
 
     before(async () => {
         fileContents = await loadTestFile();
-        doc.settings.excludeFirstLineInNote = true;
+        const settings = new NoteRefactorSettings();
+        settings.excludeFirstLineInNote = true;
+        doc = new NRDoc(settings);
         content = toArray(fileContents, 0, 15);
     });
     
@@ -70,9 +68,6 @@ describe("Note content - First Line as File Name, exclude first line", () => {
         assert.equal(noteContent.length, 709);
     });
 
-    after(() => {
-        doc.settings = new NoteRefactorSettings();
-    });
 });
 
 describe("Note content - First Line as File Name, first line as heading", () => {
@@ -81,8 +76,10 @@ describe("Note content - First Line as File Name, first line as heading", () => 
 
     before(async () => {
         fileContents = await loadTestFile();
-        doc.settings.includeFirstLineAsNoteHeading = true;
-        doc.settings.headingFormat = '#';
+        const settings = new NoteRefactorSettings();
+        settings.includeFirstLineAsNoteHeading = true;
+        settings.headingFormat = '#';
+        doc = new NRDoc(settings);
         content = toArray(fileContents, 0, 15);
     });
     
@@ -111,17 +108,16 @@ describe("Note content - First Line as File Name, first line as heading", () => 
         assert.equal(noteContent.length, 748);
     });
 
-    after(() => {
-        doc.settings = new NoteRefactorSettings();
-    });
 });
 
 describe("Note content - First Line as File Name, first line as heading (modified heading)", () => {
 
     before(async () => {
         fileContents = await loadTestFile();
-        doc.settings.includeFirstLineAsNoteHeading = true;
-        doc.settings.headingFormat = '#';
+        const settings = new NoteRefactorSettings();
+        settings.includeFirstLineAsNoteHeading = true;
+        settings.headingFormat = '#';
+        doc = new NRDoc(settings);
         content = toArray(fileContents, 4, 28);
     });
     
@@ -155,9 +151,6 @@ describe("Note content - First Line as File Name, first line as heading (modifie
         assert.equal(noteContent.length, 1105);
     });
 
-    after(() => {
-        doc.settings = new NoteRefactorSettings();
-    });
 });
 
 

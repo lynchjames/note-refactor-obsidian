@@ -2,13 +2,9 @@ import { Editor } from 'codemirror';
 import { NoteRefactorSettings } from './settings';
 
 export default class NRDoc {
-    settings: NoteRefactorSettings;
+    private settings: NoteRefactorSettings;
     constructor(settings: NoteRefactorSettings){
         this.settings = settings;
-    }
-
-    test(doc:Editor) {
-      
     }
 
     removeNoteRemainder(doc:Editor, text:string): void {

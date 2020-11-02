@@ -4,55 +4,56 @@ import { mockDate}  from './mocks/date';
 import NRFile from '../src/file';
 import { NoteRefactorSettings } from '../src/settings';
 
-const file = new NRFile(new NoteRefactorSettings);
+let file: NRFile = null;
 const date = new Date(2020, 11, 25, 11, 17, 52);
 
 
 describe("File Name Prefix", () => {
     let resetDateMock:() => void;
-
+    let settings = new NoteRefactorSettings();
+    
     before(async () => {
+        file = new NRFile(settings);
         resetDateMock = mockDate(date);
     });
 
     it("Correct prefix for YYYYMMDDHHmm", () => {
-        file.settings.fileNamePrefix = '{{date:YYYYMMDDHHmm}}-';
+        settings.fileNamePrefix = '{{date:YYYYMMDDHHmm}}-';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, '202012251117-');
     });
     
     it("Correct prefix for YYYYMMDDHHmmss", () => {
-        file.settings.fileNamePrefix = '{{date:YYYYMMDDHHmmss}}-';
+        settings.fileNamePrefix = '{{date:YYYYMMDDHHmmss}}-';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, '20201225111752-');
     });
 
     it("Correct prefix for word dates YYYY-MMMM-Do_dddd", () => {
-        file.settings.fileNamePrefix = '{{date:YYYY-MMMM-Do_dddd}}-';
+        settings.fileNamePrefix = '{{date:YYYY-MMMM-Do_dddd}}-';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, '2020-December-25th_Friday-');
     });
 
     it("Correct prefix for with text and date", () => {
-        file.settings.fileNamePrefix = 'ZK_{{date:YYYYMMDDHHmm}}-';
+        settings.fileNamePrefix = 'ZK_{{date:YYYYMMDDHHmm}}-';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, 'ZK_202012251117-');
     });
 
     it("No date in prefix", () => {
-        file.settings.fileNamePrefix = 'Inbox-Note-';
+        settings.fileNamePrefix = 'Inbox-Note-';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, 'Inbox-Note-');
     });
 
     it("No prefix", () => {
-        file.settings.fileNamePrefix = '';
+        settings.fileNamePrefix = '';
         const prefix = file.fileNamePrefix();
         assert.equal(prefix, '');
     });
 
     after(() => {
-        file.settings = new NoteRefactorSettings();
         resetDateMock();
     });
 });
@@ -60,8 +61,10 @@ describe("File Name Prefix", () => {
 describe("File Name Sanitisation", () => {
     let fileName = '';
     let resetDateMock:() => void;
+    let settings = new NoteRefactorSettings();
 
     before(async () => {
+        file = new NRFile(settings);
         resetDateMock = mockDate(date);
     });
 
@@ -97,13 +100,12 @@ describe("File Name Sanitisation", () => {
 
     it("With prefix", () => {
         fileName = '## A Heading Goes Here';
-        file.settings.fileNamePrefix = 'ZK-{{date:YYYY-MMM-DD-HHmm}}-';
+        settings.fileNamePrefix = 'ZK-{{date:YYYY-MMM-DD-HHmm}}-';
         const sanitised = file.sanitisedFileName(fileName);
         assert.equal(sanitised, 'ZK-2020-Dec-25-1117-A Heading Goes Here');
     });
 
     after(() => {
-        file.settings = new NoteRefactorSettings();
         resetDateMock();
     });
 });

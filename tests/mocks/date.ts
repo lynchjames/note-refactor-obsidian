@@ -1,4 +1,5 @@
 /**
+ * https://kimpers.com/mocking-date-and-time-in-tests-with-typescript-and-jest
  * @param {Date} expected The date to which we want to freeze time
  * @returns {Function} Call to remove Date mocking
  */
