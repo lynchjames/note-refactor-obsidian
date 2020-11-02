@@ -92,8 +92,8 @@ describe("File Name Sanitisation", () => {
         assert.equal(sanitised, 'A Heading Goes Here');
     });
 
-    it("Illegal file path character sanitisation (*\"\/<>:|", () => {
-        fileName = '*This has\\/ "a lot" of <illegal>: |characters|' ;
+    it("Illegal file path character sanitisation (*\"\/<>:|?", () => {
+        fileName = '**This has**\\/ "a lot" of <illegal>: |characters??|' ;
         const sanitised = file.sanitisedFileName(fileName);
         assert.equal(sanitised, 'This has a lot of illegal characters');
     });

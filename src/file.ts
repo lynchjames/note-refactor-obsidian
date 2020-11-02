@@ -11,7 +11,7 @@ export default class NRFile {
     }
 
     sanitisedFileName(unsanitisedFilename: string): string {
-      const headerRegex = /[#*"\/\\<>:|\[\]]/gim;
+      const headerRegex = /[#*"\/\\<>:|\[\]\?]/gim;
       const prefix = this.fileNamePrefix();
       const checkedPrefix = unsanitisedFilename.startsWith(prefix) ? '' : prefix;
       return checkedPrefix + unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);
