@@ -21,14 +21,17 @@ Headings (`#`) characters and other illegal characters for filenames are removed
 ## Usage
 This table shows the different use cases for this plugin and how commands and settings can be used in each case.
 
+### Extracting
 | Use case                                                      | Command                          | Plugin Settings                         |
 | --------------------------------------------------------------| -------------------------------- | -------------------------------- |
-| **Extracting** |
 | 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note provided by the user. | Extract selection to new note - content only | **Include Heading**<br />False |
 | 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note set from the first line of the selection | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />False |
 | 1. Extract a selection into a new note.<br />2. File name for new note set from the first line of the selection.<br />3. First line included in the new note as a heading. | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />True |
 | 1. Extract a selection into a new note<br />2. File name for new note set from the first line of the selection.<br />3. First line not included in the new note. | Extract selection to new note - first line as file name | **Exclude First Line**<br />True <br/><br /> |
-| **Splitting** |
+
+### Splitting
+| Use case                                                      | Command                          | Plugin Settings                         |
+| --------------------------------------------------------------| -------------------------------- | -------------------------------- |
 | 1. Split a note from the current line of the cursor into new note exactly as it is.<br />2. File name for new note provided by the user. | Split note here - content only | **Include Heading**<br/>False |
 | 1. Split a note from the current line of the cursor into new note.<br />2. File name for new note provided by the user.<br />3. First line included in the new note as a heading. | Split note here - content only | **Include Heading**<br/>True |
 | 1. Split a note from the current line of the cursor into new note exactly as it is.<br />2. File name for new note set from the first line of the selection. | Split note here - first line as file name | **Include Heading**<br />False |
