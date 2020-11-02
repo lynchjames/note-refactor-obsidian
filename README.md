@@ -1,6 +1,6 @@
 # Note Refactor
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/note-refactor-obsidian/Release%20Build?logo=github&style=for-the-badge)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/note-refactor-obsidian?style=for-the-badge)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/note-refactor-obsidian/Release%20Build?logo=github&style=for-the-badge)](https://github.com/lynchjames/note-refactor-obsidian/actions?query=workflow%3A%22Release+Build%22)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/note-refactor-obsidian?style=for-the-badge&sort=semver)](https://github.com/lynchjames/note-refactor-obsidian/releases/latest)
 
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for extracting the selected portion of a notes into new note. 
