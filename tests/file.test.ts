@@ -98,12 +98,22 @@ describe("File Name Sanitisation", () => {
         assert.equal(sanitised, 'This has a lot of illegal characters');
     });
 
-    it("With prefix", () => {
+    it("Should include prefix", () => {
         fileName = '## A Heading Goes Here';
         settings.fileNamePrefix = 'ZK-{{date:YYYY-MMM-DD-HHmm}}-';
         const sanitised = file.sanitisedFileName(fileName);
         assert.equal(sanitised, 'ZK-2020-Dec-25-1117-A Heading Goes Here');
     });
+
+    it("Idempotent sanitisation with no duplicate prefixes", () => {
+        fileName = '## A Heading Goes Here';
+        settings.fileNamePrefix = 'ZK-{{date:YYYY-MMM-DD-HHmm}}-';
+        let sanitised = file.sanitisedFileName(fileName);
+        sanitised = file.sanitisedFileName(sanitised);
+        sanitised = file.sanitisedFileName(sanitised);
+        assert.equal(sanitised, 'ZK-2020-Dec-25-1117-A Heading Goes Here');
+    });
+
 
     after(() => {
         resetDateMock();
