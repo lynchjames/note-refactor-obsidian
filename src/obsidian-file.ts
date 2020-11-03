@@ -6,7 +6,6 @@ import NRFile from './file';
 export default class ObsidianFile {
     private settings: NoteRefactorSettings;
     private vault: Vault;
-    private view: MarkdownView;
     private app: App;
     private file: NRFile;
     private momentDateRegex: MomentDateRegex;
@@ -19,14 +18,14 @@ export default class ObsidianFile {
         this.momentDateRegex = new MomentDateRegex();
     }
 
-    filePath(view: any) : string {
+    filePath(view: MarkdownView) : string {
         let path = '';
         switch(this.settings.newFileLocation){
           case Location.VaultFolder:
             path = this.vault.getRoot().path;
             break;
           case Location.SameFolder:
-            path = this.view.file.parent.path;
+            path = view.file.parent.path;
             break;
           case Location.SpecifiedFolder:
             path = this.momentDateRegex.replace(this.settings.customFolder);

@@ -15,6 +15,13 @@
       "es5",
       "scripthost",
       "es2015"
+    ],
+    "plugins": [
+      {
+        "transform": "ts-auto-mock/transformer",
+        "cacheBetweenTests": false,
+        "features": ["random"]
+      }
     ]
   },
   "include": [
