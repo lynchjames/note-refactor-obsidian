@@ -53,17 +53,27 @@ export default class ObsidianFile {
           const folderExists = await this.vault.adapter.exists(folderPath, false);
             if(!folderExists) {
               const folders = folderPath.split('/');
-              await this.createFoldersFromVaultRoot('', folders);
-              await this.vault.create(filePath, note);      
+              try {
+                await this.createFoldersFromVaultRoot('', folders);
+                await this.vault.create(filePath, note);      
+              } catch (error) {
+                console.error(error)
+                return true;
+              }
             } else {
               //Otherwise save the file into the existing folder
-              await this.vault.create(filePath, note);
+              try {
+                await this.vault.create(filePath, note);
+              } catch (error) {
+                console.error(error);
+                return true;
+              }
             }
             return false;
         }
     }
   
-    async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
+    private async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {
       if(folders.length === 0) {
         return;
       }
