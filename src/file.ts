@@ -1,3 +1,4 @@
+import { FILE_NAME_REGEX } from './constants'
 import { NoteRefactorSettings } from './settings';
 import MomentDateRegex from './moment-date-regex'
 
@@ -11,7 +12,7 @@ export default class NRFile {
     }
 
     sanitisedFileName(unsanitisedFilename: string): string {
-      const headerRegex = /[#*"\/\\<>:|\[\]\?]/gim;
+      const headerRegex = FILE_NAME_REGEX;
       const prefix = this.fileNamePrefix();
       const checkedPrefix = unsanitisedFilename.startsWith(prefix) ? '' : prefix;
       return checkedPrefix + unsanitisedFilename.replace(headerRegex, '').trim().slice(0, 255);

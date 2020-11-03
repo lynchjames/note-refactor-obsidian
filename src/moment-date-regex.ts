@@ -1,9 +1,10 @@
+import { DEFAULT_DATE_FORMAT, DATE_REGEX } from './constants';
 import * as moment from 'moment';
 
 export default class MomentDateRegex {
     replace(input: string): string {
         //A regex to capture multiple matches, each with a target group ({date:YYMMDD}) and date group (YYMMDD)
-        const dateRegex = /(?<target>{{date:?(?<date>[^}]*)}})/g;
+        const dateRegex = DATE_REGEX;
         const customFolderString = input;
         //Iterate through the matches to collect them in a single array
         const matches = [];
@@ -19,7 +20,7 @@ export default class MomentDateRegex {
         //Transform date matches into moment formatted dates
         const formattedDates = matches.map(m => {
           //Default to YYYYMMDDHHmm if {{date}} is used
-          const dateFormat = m.groups.date === '' ? 'YYYYMMDDHHmm' : m.groups.date;
+          const dateFormat = m.groups.date === '' ? DEFAULT_DATE_FORMAT : m.groups.date;
           return [m.groups.target, 
             this.getMoment(now, dateFormat)];
         });

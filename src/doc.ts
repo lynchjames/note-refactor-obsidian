@@ -1,4 +1,5 @@
 import { Editor } from 'codemirror';
+import { HEADING_REGEX } from './constants';
 import { NoteRefactorSettings } from './settings';
 
 export default class NRDoc {
@@ -41,8 +42,7 @@ export default class NRDoc {
     noteContent(firstLine:string, contentArr:string[], contentOnly?:boolean): string {
       if(this.settings.includeFirstLineAsNoteHeading){
         //Replaces any non-word characters whitespace leading the first line to enforce consistent heading format from setting
-        const headingRegex = /^[#\s-]*/;
-        const headingBaseline = firstLine.replace(headingRegex, '');
+        const headingBaseline = firstLine.replace(HEADING_REGEX, '');
         //Adds formatted heading into content array as first item. 
         //Trimming allows for an empty heading format. 
         contentArr.unshift(`${this.settings.headingFormat} ${headingBaseline}`.trim());
