@@ -13,3 +13,4 @@ note-refactor*.zip
 dist/
 coverage/
 .nyc_output/
+test-vault/
