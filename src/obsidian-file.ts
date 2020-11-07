@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice, Vault } from 'obsidian';
+import { App, Notice, Vault } from 'obsidian';
 import { NoteRefactorSettings, Location } from './settings';
 import MomentDateRegex from './moment-date-regex'
 import NRFile from './file';
@@ -6,7 +6,6 @@ import NRFile from './file';
 export default class ObsidianFile {
     private settings: NoteRefactorSettings;
     private vault: Vault;
-    private view: MarkdownView;
     private app: App;
     private file: NRFile;
     private momentDateRegex: MomentDateRegex;
@@ -26,7 +25,7 @@ export default class ObsidianFile {
             path = this.vault.getRoot().path;
             break;
           case Location.SameFolder:
-            path = this.view.file.parent.path;
+            path = view.file.parent.path;
             break;
           case Location.SpecifiedFolder:
             path = this.momentDateRegex.replace(this.settings.customFolder);
@@ -40,7 +39,7 @@ export default class ObsidianFile {
     }
 
     async createFile(fileName: string, note: string): Promise<boolean> {
-      const view = this.app;
+      const view = this.app.workspace.activeLeaf.view;
       const folderPath = this.filePath(view);
       const filePath = this.filePathAndFileName(fileName, view);
       console.log('File path in create file', filePath);
