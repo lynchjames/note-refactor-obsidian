@@ -25,7 +25,7 @@ import NoteRefactor from './main';
   
       new Setting(containerEl)
         .setName('Default location for new notes')
-        .setDesc('Where newly created notes are placed. Plugin settings will override this.')
+        .setDesc('Where newly created notes are placed.')
         .addDropdown(dropDown => 
           dropDown
             .addOption(Location[Location.VaultFolder], "Vault folder")
