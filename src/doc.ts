@@ -15,7 +15,8 @@ export default class NRDoc {
     }
 
     replaceContent(fileName:string, doc:Editor, split?:boolean): void {
-        const internalLink = `[[${fileName}]]`;
+        const transclude = this.settings.transcludeByDefault ? '!' : '';
+        const internalLink = `${transclude}[[${fileName}]]`;
         if(split){ 
             this.removeNoteRemainder(doc, internalLink);
         } else {
