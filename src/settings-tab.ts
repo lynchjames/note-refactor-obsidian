@@ -67,6 +67,15 @@ import NoteRefactor from './main';
       }));
 
       new Setting(containerEl)
+      .setName('Transclude by default')
+      .setDesc('When content has been extracted/split into a new note, include a transclusion of the new note')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.transcludeByDefault)
+        .onChange((value) => {
+          this.plugin.settings.transcludeByDefault = value;
+          this.plugin.saveData(this.plugin.settings);
+        }));
+
+      new Setting(containerEl)
       .setName('Exclude First Line')
       .setDesc('Prevent the first line of selected/split note content from being included in the new note (only applies for first line as file name commands)')
       .addToggle(toggle => toggle.setValue(this.plugin.settings.excludeFirstLineInNote)
