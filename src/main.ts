@@ -99,7 +99,7 @@ export default class NoteRefactor extends Plugin {
       const note = this.NRDoc.noteContent(header, contentArr);
       const exists = await this.obsFile.createFile(fileName, note);
       if(!exists){
-        this.NRDoc.replaceContent(fileName, doc, split)
+        this.NRDoc.replaceContent(fileName, doc, mdView.file.name, note, split)
         await this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
       }
   }

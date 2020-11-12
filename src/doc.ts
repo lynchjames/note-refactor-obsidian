@@ -1,11 +1,18 @@
 import { Editor } from 'codemirror';
 import { HEADING_REGEX } from './constants';
+import MomentDateRegex from './moment-date-regex';
+import { NotePlaceholders } from './placeholder';
 import { NoteRefactorSettings } from './settings';
 
 export default class NRDoc {
     private settings: NoteRefactorSettings;
+    private templatePlaceholders: NotePlaceholders;
+    private momentRegex: MomentDateRegex;
+    
     constructor(settings: NoteRefactorSettings){
         this.settings = settings;
+        this.templatePlaceholders = new NotePlaceholders();
+        this.momentRegex = new MomentDateRegex();
     }
 
     removeNoteRemainder(doc:Editor, text:string): void {
@@ -14,14 +21,29 @@ export default class NRDoc {
         doc.replaceRange(text, currentLine, endPosition);
     }
 
-    replaceContent(fileName:string, doc:Editor, split?:boolean): void {
+    replaceContent(fileName:string, doc:Editor, currentNoteTitle: string, content: string, split?:boolean): void {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
-        const internalLink = `${transclude}[[${fileName}]]`;
+        let contentToInsert = `${transclude}[[${fileName}]]`;
+        
+        contentToInsert = this.templatedLinkContent(contentToInsert, currentNoteTitle, fileName, content);
+
         if(split){ 
-            this.removeNoteRemainder(doc, internalLink);
+            this.removeNoteRemainder(doc, contentToInsert);
         } else {
-            doc.replaceSelection(internalLink);
+            doc.replaceSelection(contentToInsert);
         }
+    }
+
+    private templatedLinkContent(input: string, currentNoteTitle: string, newNoteTitle: string, newNoteContent: string): string {
+      if(this.settings.noteLinkTemplate === undefined || this.settings.noteLinkTemplate === ''){
+        return input;
+      }
+      let output = this.settings.noteLinkTemplate;
+      output = this.momentRegex.replace(output);
+      output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
+      output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
+      output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
+      return output;
     }
 
     selectedContent(doc:Editor): string[] {

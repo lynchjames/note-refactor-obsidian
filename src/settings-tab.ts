@@ -56,7 +56,7 @@ import NoteRefactor from './main';
       new Setting(containerEl)
       .setName('File name prefix')
       .setDesc(this.filenamePrefixDescriptionContent())
-      .addTextArea((text) =>
+      .addTextArea((text) => {
           text
               .setPlaceholder("Example: {{date:YYYYMMDDHHmm}}-")
               .setValue(this.plugin.settings.fileNamePrefix || '')
@@ -64,7 +64,10 @@ import NoteRefactor from './main';
                   this.plugin.settings.fileNamePrefix = value;
                   this.plugin.saveData(this.plugin.settings);
                   this.updateFileNamePrefixUPop();
-      }));
+              });
+              text.inputEl.rows = 2;
+              text.inputEl.cols = 25;
+      });
 
       new Setting(containerEl)
       .setName('Transclude by default')
@@ -74,6 +77,22 @@ import NoteRefactor from './main';
           this.plugin.settings.transcludeByDefault = value;
           this.plugin.saveData(this.plugin.settings);
         }));
+
+      new Setting(containerEl)
+      .setName('Note link template')
+      .setDesc(this.tempalteDescriptionContent())
+      .addTextArea((text) => {
+          text
+              .setPlaceholder("Example: See also -> [[{{new_note_title}}]]")
+              .setValue(this.plugin.settings.noteLinkTemplate || '')
+              .onChange((value) => {
+                  this.plugin.settings.noteLinkTemplate = value;
+                  this.plugin.saveData(this.plugin.settings);
+                  return text;
+              })
+            text.inputEl.rows = 10;
+            text.inputEl.cols = 25;
+        });
 
       new Setting(containerEl)
       .setName('Exclude First Line')
@@ -108,6 +127,16 @@ import NoteRefactor from './main';
                       this.plugin.saveData(this.plugin.settings);
           }));
         }
+    }
+
+    private tempalteDescriptionContent(): DocumentFragment {
+      const descEl = document.createDocumentFragment();
+      descEl.appendText('The template used to generate the link to the extracted note. This overrides the Transclude by Default setting.');
+      descEl.appendChild(document.createElement('br'));
+      descEl.appendText('Supported placeholders:');
+      descEl.appendChild(document.createElement('br'));
+      descEl.appendText('{{date}} {{title}} {{new_note_title}} {{new_note_content}}');
+      return descEl;
     }
   
     private folderDescriptionContent(): DocumentFragment {

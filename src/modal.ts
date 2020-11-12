@@ -1,6 +1,6 @@
 import NRDoc from './doc';
 import NRFile from './file';
-import { App, Modal, Setting } from 'obsidian';
+import { App, MarkdownView, Modal, Setting } from 'obsidian';
 import { Editor } from 'codemirror';
 import ObsidianFile from './obsidian-file';
 
@@ -53,11 +53,12 @@ export default class FileNameModal extends Modal {
 
       private async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
+          const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
           const fileName = this.file.sanitisedFileName(input.value);
           const exists = await this.obsFile.createFile(fileName, this.content)
           if(!exists) {
-            this.doc.replaceContent(fileName, this.editor, this.split);
-            this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
+            this.doc.replaceContent(fileName, this.editor, currentView.file.name, this.content, this.split);
+            this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
             this.close();
           }
         }
@@ -66,8 +67,9 @@ export default class FileNameModal extends Modal {
       private async submitModal(fileName: string) : Promise<void> {
         const exists = await this.obsFile.createFile(fileName, this.content)
         if(!exists) {
-          this.doc.replaceContent(fileName, this.editor, this.split);
-          this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
+          const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
+          this.doc.replaceContent(fileName, this.editor, currentView.file.name, this.content, this.split);
+          this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
           this.close();
         }
       }
