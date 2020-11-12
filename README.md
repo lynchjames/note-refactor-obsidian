@@ -104,9 +104,13 @@ A prefix set as `{{date:YYYYMMDDHHmm}}-` will add a new file with the following 
 
 `202010311425-My New Note`
 
+### Transclude by Default
+
+This config settings means that all inserted internal links to new notes created by any of the extraction or note splitting commands will be added as a transclusion/note embed `![[new note]]` rather than a link `[[new note]]`.
+
 ### First Line included as Note Heading
 
-A config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
+This config setting allows for the first line of the selected text to be included in the new note content as a heading with a configurable heading format `#`, `##`, `###`, etc.
 
 This setting is applied for either the First Line filename or Content Only commands. 
 ![note heading demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
