@@ -1,11 +1,18 @@
 import { Editor } from 'codemirror';
 import { HEADING_REGEX } from './constants';
+import MomentDateRegex from './moment-date-regex';
+import { NotePlaceholders } from './placeholder';
 import { NoteRefactorSettings } from './settings';
 
 export default class NRDoc {
     private settings: NoteRefactorSettings;
+    private templatePlaceholders: NotePlaceholders;
+    private momentRegex: MomentDateRegex;
+    
     constructor(settings: NoteRefactorSettings){
         this.settings = settings;
+        this.templatePlaceholders = new NotePlaceholders();
+        this.momentRegex = new MomentDateRegex();
     }
 
     removeNoteRemainder(doc:Editor, text:string): void {
@@ -14,14 +21,30 @@ export default class NRDoc {
         doc.replaceRange(text, currentLine, endPosition);
     }
 
-    replaceContent(fileName:string, doc:Editor, split?:boolean): void {
+    replaceContent(fileName:string, doc:Editor, currentNoteTitle: string, content: string, split?:boolean): void {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
-        const internalLink = `${transclude}[[${fileName}]]`;
+        let contentToInsert = `${transclude}[[${fileName}]]`;
+        
+        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, content);
+
         if(split){ 
-            this.removeNoteRemainder(doc, internalLink);
+            this.removeNoteRemainder(doc, contentToInsert);
         } else {
-            doc.replaceSelection(internalLink);
+            doc.replaceSelection(contentToInsert);
         }
+    }
+
+    templatedContent(input: string, template: string, currentNoteTitle: string, newNoteTitle: string, newNoteContent: string): string {
+      if(template === undefined || template === ''){
+        return input;
+      }
+      let output = template;
+      output = this.momentRegex.replace(output);
+      output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
+      output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
+      output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
+      console.log('Template output', output);
+      return output;
     }
 
     selectedContent(doc:Editor): string[] {
@@ -51,6 +74,6 @@ export default class NRDoc {
         //Adds first line back into content if it is not to be included as a header or if the command is content only
         contentArr.unshift(firstLine);
       }
-      return contentArr.join('\n').trim()
+      return contentArr.join('\n').trim();
     }
 }

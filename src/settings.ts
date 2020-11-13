@@ -8,6 +8,8 @@ export class NoteRefactorSettings {
     customFolder: string = '';
     fileNamePrefix: string = '';
     transcludeByDefault: boolean = false;
+    noteLinkTemplate: string = '';
+    refactoredNoteTemplate: string = '';
   }
   
 export enum Location {

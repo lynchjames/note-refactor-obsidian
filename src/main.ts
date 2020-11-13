@@ -96,10 +96,15 @@ export default class NoteRefactor extends Plugin {
       const [header, ...contentArr] = selectedContent;
 
       const fileName = this.file.sanitisedFileName(header);
-      const note = this.NRDoc.noteContent(header, contentArr);
+      let note = this.NRDoc.noteContent(header, contentArr);
+
+      if(this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
+        note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, fileName, note);
+      }
+
       const exists = await this.obsFile.createFile(fileName, note);
       if(!exists){
-        this.NRDoc.replaceContent(fileName, doc, split)
+        this.NRDoc.replaceContent(fileName, doc, mdView.file.name, note, split)
         await this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
       }
   }
@@ -115,6 +120,8 @@ export default class NoteRefactor extends Plugin {
   }
   
   loadModal(contentArr:string[], doc:CodeMirror.Editor, split:boolean): void {
-    new FileNameModal(this.app, this.NRDoc, this.file, this.obsFile, this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true), doc, split).open();
+    let note = this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true);
+
+    new FileNameModal(this.app, this.settings, this.NRDoc, this.file, this.obsFile, note, doc, split).open();
   }
 }
