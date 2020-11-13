@@ -25,7 +25,7 @@ export default class NRDoc {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
         let contentToInsert = `${transclude}[[${fileName}]]`;
         
-        contentToInsert = this.templatedLinkContent(contentToInsert, currentNoteTitle, fileName, content);
+        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, content);
 
         if(split){ 
             this.removeNoteRemainder(doc, contentToInsert);
@@ -34,15 +34,16 @@ export default class NRDoc {
         }
     }
 
-    private templatedLinkContent(input: string, currentNoteTitle: string, newNoteTitle: string, newNoteContent: string): string {
-      if(this.settings.noteLinkTemplate === undefined || this.settings.noteLinkTemplate === ''){
+    templatedContent(input: string, template: string, currentNoteTitle: string, newNoteTitle: string, newNoteContent: string): string {
+      if(template === undefined || template === ''){
         return input;
       }
-      let output = this.settings.noteLinkTemplate;
+      let output = template;
       output = this.momentRegex.replace(output);
+      output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
-      output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
+      console.log('Template output', output);
       return output;
     }
 
@@ -73,6 +74,6 @@ export default class NRDoc {
         //Adds first line back into content if it is not to be included as a header or if the command is content only
         contentArr.unshift(firstLine);
       }
-      return contentArr.join('\n').trim()
+      return contentArr.join('\n').trim();
     }
 }

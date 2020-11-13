@@ -9,6 +9,7 @@ export class NoteRefactorSettings {
     fileNamePrefix: string = '';
     transcludeByDefault: boolean = false;
     noteLinkTemplate: string = '';
+    refactoredNoteTemplate: string = '';
   }
   
 export enum Location {

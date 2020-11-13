@@ -3,8 +3,10 @@ import NRFile from './file';
 import { App, MarkdownView, Modal, Setting } from 'obsidian';
 import { Editor } from 'codemirror';
 import ObsidianFile from './obsidian-file';
+import { NoteRefactorSettings } from './settings';
 
 export default class FileNameModal extends Modal {
+    settings: NoteRefactorSettings;
     content: string;
     doc: NRDoc;
     obsFile: ObsidianFile;
@@ -13,8 +15,9 @@ export default class FileNameModal extends Modal {
     split: boolean;
     fileNameInput: HTMLInputElement;
     
-    constructor(app: App, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, split: boolean) {
+    constructor(app: App, settings: NoteRefactorSettings, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, split: boolean) {
       super(app);
+      this.settings = settings;
       this.content = content;
       this.doc = doc;
       this.obsFile = obsFile;
@@ -54,24 +57,38 @@ export default class FileNameModal extends Modal {
       private async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
           const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
+          const currentFile = currentView.file;
           const fileName = this.file.sanitisedFileName(input.value);
-          const exists = await this.obsFile.createFile(fileName, this.content)
+          const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
+
+          const exists = await this.obsFile.createFile(fileName, templatedContent)
           if(!exists) {
-            this.doc.replaceContent(fileName, this.editor, currentView.file.name, this.content, this.split);
+            this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.split);
             this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
             this.close();
           }
         }
       }
-
+    
       private async submitModal(fileName: string) : Promise<void> {
         const exists = await this.obsFile.createFile(fileName, this.content)
         if(!exists) {
           const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
-          this.doc.replaceContent(fileName, this.editor, currentView.file.name, this.content, this.split);
+          const currentFile = currentView.file;
+          const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
+
+          this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.split);
           this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
           this.close();
         }
+      }
+
+      private templatedContent(note: string, currentFileName: string, fileName: string) {
+        console.log(this.settings.refactoredNoteTemplate);
+        if(this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
+          return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, currentFileName, fileName, note);
+        }
+        return note;
       }
   
       onClose() {

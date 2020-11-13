@@ -115,6 +115,28 @@ This config setting allows for the first line of the selected text to be include
 This setting is applied for either the First Line filename or Content Only commands. 
 ![note heading demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Include-First-Line-as-Note-Heading.gif)
 
+### Note Link Template
+
+This setting sets the template used to generate the content to link to the extracted note. This overrides the Transclude by Default setting.
+
+The following placeholders are supported and will be replaced with dynamic values when the plugin command is exectuted:
+
+- `{{date}}` the current date, this also supports date and time formats such as `YYYYMMDD` and `HH:mm`.
+- `{{title}}` the title of the original note.
+- `{{new_note_title}}` the title of the new note.
+- `{{new_note_content}}` the refactored content for the new note.
+
+### Refactored Note Template
+
+This setting sets the template used to generate the content for the refactored note.
+
+The following placeholders are supported and will be replaced with dynamic values when the plugin command is exectuted:
+
+- `{{date}}` the current date, this also supports date and time formats such as `YYYYMMDD` and `HH:mm`.
+- `{{title}}` the title of the original note.
+- `{{new_note_title}}` the title of the new note.
+- `{{new_note_content}}` the refactored content for the new note.
+
 ## Compatibility
 
 Custom plugins are only available for Obsidian v0.9.7+.
