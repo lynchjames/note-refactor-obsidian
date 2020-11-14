@@ -40,7 +40,7 @@ This table shows the different use cases for this plugin and how commands and se
 | 2 | 1. Split a note from the current line of the cursor into new note.<br />2. File name for new note provided by the user.<br />3. First line included in the new note as a heading. | Split note here - content only | **Include Heading**<br/>True |
 | 3 | 1. Split a note from the current line of the cursor into new note exactly as it is.<br />2. File name for new note set from the first line of the selection. | Split note here - first line as file name | **Include Heading**<br />False |
 | 4 | 1. Split a note from the current line of the cursor into a new note.<br />2. File name for new note set from the first line of the selection.<br />3. First line included in the new note as a heading. | Split note here - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />True |
-| 5 | 1. Split a note with content under a heading going into a new note for each heading.<br />2. File name for each new note set from the heading. | Split note by headings - H1<br/><br/> Split note by headings - H2 <br/><br/> Split note by headings - H3 | **Include Heading**<br />False |
+| 5 | 1. Split a note with content under a heading going into a new note for each heading.<br />2. File name for each new note set from the heading. | Split note by headings - H1<br/><br/> Split note by headings - H2 <br/><br/> Split note by headings - H3 |  |
 
 ## Commands
 
