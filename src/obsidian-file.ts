@@ -42,7 +42,6 @@ export default class ObsidianFile {
       const view = this.app.workspace.activeLeaf.view;
       const folderPath = this.filePath(view);
       const filePath = this.filePathAndFileName(fileName, view);
-      console.log('File path in create file', filePath);
       const exists = await this.vault.adapter.exists(filePath, false);
         if(exists){
           new Notice(`A file named ${fileName} already exists`);

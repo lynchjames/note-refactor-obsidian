@@ -1,4 +1,4 @@
-import NRDoc from './doc';
+import NRDoc, { ReplaceMode } from './doc';
 import NRFile from './file';
 import { App, MarkdownView, Modal, Setting } from 'obsidian';
 import { Editor } from 'codemirror';
@@ -12,10 +12,10 @@ export default class FileNameModal extends Modal {
     obsFile: ObsidianFile;
     file: NRFile
     editor: Editor;
-    split: boolean;
+    mode: ReplaceMode;
     fileNameInput: HTMLInputElement;
     
-    constructor(app: App, settings: NoteRefactorSettings, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, split: boolean) {
+    constructor(app: App, settings: NoteRefactorSettings, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, mode: ReplaceMode) {
       super(app);
       this.settings = settings;
       this.content = content;
@@ -23,7 +23,7 @@ export default class FileNameModal extends Modal {
       this.obsFile = obsFile;
       this.file = file;
       this.editor = editor;
-      this.split = split;
+      this.mode = mode;
     }
 
       onOpen() {
@@ -56,17 +56,8 @@ export default class FileNameModal extends Modal {
 
       private async handleKeyUp(input: HTMLInputElement, event: KeyboardEvent) {
         if(event.key === 'Enter'){
-          const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
-          const currentFile = currentView.file;
           const fileName = this.file.sanitisedFileName(input.value);
-          const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
-
-          const exists = await this.obsFile.createFile(fileName, templatedContent)
-          if(!exists) {
-            this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.split);
-            this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
-            this.close();
-          }
+          this.submitModal(fileName);
         }
       }
     
@@ -77,14 +68,13 @@ export default class FileNameModal extends Modal {
           const currentFile = currentView.file;
           const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
 
-          this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.split);
+          this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.content, this.mode);
           this.app.workspace.openLinkText(fileName, this.obsFile.filePath(currentView), true);
           this.close();
         }
       }
 
       private templatedContent(note: string, currentFileName: string, fileName: string) {
-        console.log(this.settings.refactoredNoteTemplate);
         if(this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
           return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, currentFileName, fileName, note);
         }
@@ -94,5 +84,5 @@ export default class FileNameModal extends Modal {
       onClose() {
           const {contentEl} = this;
           contentEl.empty();
-    }
+      }
   }

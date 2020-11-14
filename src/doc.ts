@@ -3,6 +3,7 @@ import { HEADING_REGEX } from './constants';
 import MomentDateRegex from './moment-date-regex';
 import { NotePlaceholders } from './placeholder';
 import { NoteRefactorSettings } from './settings';
+export type ReplaceMode = 'split' | 'replace-selection' | 'replace-headings';
 
 export default class NRDoc {
     private settings: NoteRefactorSettings;
@@ -21,16 +22,18 @@ export default class NRDoc {
         doc.replaceRange(text, currentLine, endPosition);
     }
 
-    replaceContent(fileName:string, doc:Editor, currentNoteTitle: string, content: string, split?:boolean): void {
+    replaceContent(fileName:string, doc:Editor, currentNoteTitle: string, content: string, originalContent: string, mode: ReplaceMode): void {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
         let contentToInsert = `${transclude}[[${fileName}]]`;
         
         contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, content);
 
-        if(split){ 
+        if(mode === 'split'){ 
             this.removeNoteRemainder(doc, contentToInsert);
-        } else {
+        } else if(mode === 'replace-selection') {
             doc.replaceSelection(contentToInsert);
+        } else if(mode === 'replace-headings'){
+          doc.setValue(doc.getValue().replace(originalContent, contentToInsert));
         }
     }
 
@@ -43,7 +46,6 @@ export default class NRDoc {
       output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
-      console.log('Template output', output);
       return output;
     }
 
@@ -60,6 +62,35 @@ export default class NRDoc {
       const content = doc.getRange(currentLine, endPosition);
       const trimmedContent = content.trim();
       return trimmedContent.split('\n');
+    }
+
+    contentSplitByHeading(doc:Editor, headingLevel: number): string[][] {
+      const content = doc.getValue().split('\n');
+      const parentHeading = new Array(headingLevel).join('#') + ' ';
+      const heading = new Array(headingLevel + 1).join('#') + ' ';
+      const matches: string[][] = [];
+      let headingMatch: string[] = [];
+      content.forEach((line, i) => {
+        if(line.startsWith(heading)){
+          if(headingMatch.length > 0) {
+            matches.push(headingMatch);
+            headingMatch = [];
+            headingMatch.push(line);
+          } else {
+            headingMatch.push(line);
+          }
+        } else if(headingMatch.length > 0 && !line.startsWith(parentHeading)  ){
+          headingMatch.push(line);
+        } else if(headingMatch.length > 0) {
+          matches.push(headingMatch);
+          headingMatch = [];
+        }
+        //Making sure the last headingMatch array is added to the matches
+        if(i === content.length - 1 && headingMatch.length > 0){
+          matches.push(headingMatch);
+        }
+      });
+      return matches;
     }
   
     
