@@ -12,6 +12,6 @@ export class Placeholder {
     }
 
     replace(input: string, value: string): string {
-        return input.replace(new RegExp(`\{\{${this.key}\}\}`, 'gmi'), value);
+        return input.replace(new RegExp(`\{\{${this.key}\}\}`, 'gmi'), () => value);
     }
 }
