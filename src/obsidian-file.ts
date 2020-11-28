@@ -1,4 +1,4 @@
-import { App, Notice, Vault } from 'obsidian';
+import { App, Notice, Vault, normalizePath } from 'obsidian';
 import { NoteRefactorSettings, Location } from './settings';
 import MomentDateRegex from './moment-date-regex'
 import NRFile from './file';
@@ -31,11 +31,11 @@ export default class ObsidianFile {
             path = this.momentDateRegex.replace(this.settings.customFolder);
             break;
         }
-        return this.file.normalizePath(path);
+        return normalizePath(path);
     }
   
     filePathAndFileName(fileName: string, view: any): string {
-      return this.file.normalizePath(`${this.filePath(view)}/${fileName}.md`);
+      return normalizePath(`${this.filePath(view)}/${fileName}.md`);
     }
 
     async createFile(fileName: string, note: string): Promise<boolean> {
@@ -75,7 +75,7 @@ export default class ObsidianFile {
       if(folders.length === 0) {
         return;
       }
-      const newFolderPath = this.file.normalizePath([parentPath, folders[0]].join('/'));
+      const newFolderPath = normalizePath([parentPath, folders[0]].join('/'));
       const folderExists = await this.vault.adapter.exists(newFolderPath, false)
         folders.shift();
         if(folderExists) {
