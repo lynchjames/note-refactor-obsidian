@@ -1,6 +1,6 @@
 {
   "name": "note-refactor-obsidian",
-  "version": "0.1.0",
+  "version": "1.6.0",
   "description": "Copy a text selection into a new note in Obsidian",
   "main": "main.js",
   "scripts": {
