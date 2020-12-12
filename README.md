@@ -46,7 +46,7 @@ This table shows the different use cases for this plugin and how commands and se
 
 ### Note Splitting
 
-Splitting the current note from the current line into a new note.
+Splitting the current note from the current line into a new note or append to an existing one.
 
 #### Split note here - current line as note file name
 
@@ -54,7 +54,7 @@ This command splits the current note into a new note from the current line using
 
 #### Split note here - content only
 
-This command splits the current note into a new note from the current line. The user is prompted to enter a file name for the new note.
+This command splits the current note into a new note, or append to an existing one, from the current line. The user is prompted to enter a file name for the new note.
 
 #### Split note by headings - H1, H2, H3
 
@@ -64,16 +64,16 @@ This command splits the current note into a new note for every heading at the le
 
 ### Extract Selection
 
-Extracting the current selection into a new note.
+Extracting the current selection into a new note or append to an existing one.
 
-#### Extract selection to new note - first line as filename
+#### Extract selection to new note or append to existing note - first line as filename
 
-This command copies the selected text into the content of a new note using the first line as the file name for the new note.
+This command copies the selected text into the content of a new note using the first line as the file name for the new note or append to an existing one.
 ![first line file name demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-First-Line-as-File-Name.gif)
 
-#### Extract selection to new note - content only
+#### Extract selection to new note or append to existing note - content only
 
-This command only copies the selected text into the content of a new note. The user is prompted to enter a file name for the new note.
+This command only copies the selected text into the content of a new note or append to an existing one. The user is prompted to enter a file name for the new note.
 
 ![content only demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Content-Only.gif)
 
