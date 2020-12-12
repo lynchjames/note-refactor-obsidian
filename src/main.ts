@@ -2,7 +2,8 @@ import {
   MarkdownView,
   Plugin,
   Vault, 
-  DataAdapter
+  DataAdapter,
+  SuggestModal
 } from 'obsidian';
 import MomentDateRegex from './moment-date-regex';
 import { NoteRefactorSettingsTab } from './settings-tab';
@@ -10,7 +11,8 @@ import { NoteRefactorSettings } from './settings';
 import NRFile from './file';
 import ObsidianFile from './obsidian-file';
 import NRDoc, { ReplaceMode } from './doc';
-import FileNameModal from './modal';
+import NoteRefactorModal from './note-modal';
+import ModalNoteCreation from './modal-note-creation';
 
 export default class NoteRefactor extends Plugin {
   settings: NoteRefactorSettings;
@@ -102,20 +104,11 @@ export default class NoteRefactor extends Plugin {
     }
   }
 
-  //TODO: Reintroduce this menu for heading splitting once it can be given keyboard input focus
-  // showHeadingMenu() {
-  //   const editor = this.app.workspace.getActiveLeafOfViewType(MarkdownView).sourceMode.cmEditor;
-  //   const position = editor.cursorCoords(true, 'window');
-  //   const menu = new Menu();
-  //   [1,2,3,4].forEach(number => menu.addItem(item => item.setTitle(`H${number}`).onClick(() => this.splitOnHeading(number)).setActive(number === 1)));
-  //   menu.showAtPosition({x: position.left, y: position.top});
-  // }
-
   async splitOnHeading(headingLevel: number){
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.sourceMode.cmEditor;
       const headingNotes = this.NRDoc.contentSplitByHeading(doc, headingLevel);
-      headingNotes.forEach(hn => this.createNoteWithFirstLineAsFileName(hn, mdView, doc, 'replace-headings', false));
+      headingNotes.forEach(hn => this.createNoteWithFirstLineAsFileName(hn, mdView, doc, 'replace-headings', true));
   }
 
   async extractSelectionFirstLine(mode: ReplaceMode): Promise<void> {
@@ -126,10 +119,10 @@ export default class NoteRefactor extends Plugin {
       const selectedContent = mode === 'split' ? this.NRDoc.noteRemainder(doc) : this.NRDoc.selectedContent(doc);
       if(selectedContent.length <= 0) { return }
 
-      await this.createNoteWithFirstLineAsFileName(selectedContent, mdView, doc, mode, true);
+      await this.createNoteWithFirstLineAsFileName(selectedContent, mdView, doc, mode, false);
   }
 
-  private async createNoteWithFirstLineAsFileName(selectedContent: string[], mdView: MarkdownView, doc: CodeMirror.Editor, mode: ReplaceMode, openLink: boolean) {
+  private async createNoteWithFirstLineAsFileName(selectedContent: string[], mdView: MarkdownView, doc: CodeMirror.Editor, mode: ReplaceMode, isMultiple: boolean) {
     const [header, ...contentArr] = selectedContent;
 
     const fileName = this.file.sanitisedFileName(header);
@@ -137,15 +130,13 @@ export default class NoteRefactor extends Plugin {
     let note = originalNote;
 
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
-      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, fileName, note);
+      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, fileName, '', note);
     }
 
-    const exists = await this.obsFile.createFile(fileName, note);
-    if (!exists) {
-      this.NRDoc.replaceContent(fileName, doc, mdView.file.name, note, originalNote, mode);
-      if(openLink) {
+    await this.obsFile.createOrAppendFile(fileName, note);
+    this.NRDoc.replaceContent(fileName, doc, mdView.file.name, note, originalNote, mode);
+    if(!isMultiple) {
         await this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
-      }
     }
   }
 
@@ -161,7 +152,7 @@ export default class NoteRefactor extends Plugin {
   
   loadModal(contentArr:string[], doc:CodeMirror.Editor, mode:ReplaceMode): void {
     let note = this.NRDoc.noteContent(contentArr[0], contentArr.slice(1), true);
-
-    new FileNameModal(this.app, this.settings, this.NRDoc, this.file, this.obsFile, note, doc, mode).open();
+    const modalCreation = new ModalNoteCreation(this.app, this.settings, this.NRDoc, this.file, this.obsFile, note, doc, mode);
+    new NoteRefactorModal(this.app, modalCreation).open();
   }
 }

@@ -1,3 +1,4 @@
+import { normalizePath } from 'obsidian';
 import { Editor } from 'codemirror';
 import { HEADING_REGEX } from './constants';
 import MomentDateRegex from './moment-date-regex';
@@ -26,7 +27,7 @@ export default class NRDoc {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
         let contentToInsert = `${transclude}[[${fileName}]]`;
         
-        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, content);
+        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, '', content);
 
         if(mode === 'split'){ 
             this.removeNoteRemainder(doc, contentToInsert);
@@ -37,7 +38,7 @@ export default class NRDoc {
         }
     }
 
-    templatedContent(input: string, template: string, currentNoteTitle: string, newNoteTitle: string, newNoteContent: string): string {
+    templatedContent(input: string, template: string, currentNoteTitle: string, newNoteTitle: string, newNotePath: string, newNoteContent: string): string {
       if(template === undefined || template === ''){
         return input;
       }
@@ -46,6 +47,8 @@ export default class NRDoc {
       output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
+      output = this.templatePlaceholders.newNotePath.replace(output, newNotePath);
+      output = this.templatePlaceholders.newNotePathEncoded.replace(output, normalizePath(newNotePath));
       return output;
     }
 

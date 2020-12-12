@@ -1,4 +1,4 @@
-import { App, Notice, Vault, normalizePath } from 'obsidian';
+import { App, Notice, Vault, normalizePath, TFile } from 'obsidian';
 import { NoteRefactorSettings, Location } from './settings';
 import MomentDateRegex from './moment-date-regex'
 import NRFile from './file';
@@ -38,37 +38,39 @@ export default class ObsidianFile {
       return normalizePath(`${this.filePath(view)}/${fileName}.md`);
     }
 
-    async createFile(fileName: string, note: string): Promise<boolean> {
+    async createOrAppendFile(fileName: string, note: string) {
       const view = this.app.workspace.activeLeaf.view;
       const folderPath = this.filePath(view);
       const filePath = this.filePathAndFileName(fileName, view);
-      const exists = await this.vault.adapter.exists(filePath, false);
-        if(exists){
-          new Notice(`A file named ${fileName} already exists`);
-          return true;
-        } else {
-          //Check if folder exists and create if needed
-          const folderExists = await this.vault.adapter.exists(folderPath, false);
-            if(!folderExists) {
-              const folders = folderPath.split('/');
-              try {
-                await this.createFoldersFromVaultRoot('', folders);
-                await this.vault.create(filePath, note);      
-              } catch (error) {
-                console.error(error)
-                return true;
-              }
-            } else {
-              //Otherwise save the file into the existing folder
-              try {
-                await this.vault.create(filePath, note);
-              } catch (error) {
-                console.error(error);
-                return true;
-              }
-            }
-            return false;
+      //Check if folder exists and create if needed
+      const folderExists = await this.vault.adapter.exists(folderPath, false);
+      if(!folderExists) {
+        const folders = folderPath.split('/');
+        try {
+          await this.createFoldersFromVaultRoot('', folders);
+        } catch (error) {
+          console.error(error)
         }
+      }
+      try {
+        //If files exists then append conent to existing file
+        const fileExists = await this.vault.adapter.exists(filePath);
+        if(fileExists){
+          await this.appendFile(filePath, note);
+        } else {
+          await this.vault.create(filePath, note);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async appendFile(filePath: string, note: string) {
+      let existingContent = await this.app.vault.adapter.read(filePath);
+      if(existingContent.length > 0) {
+        existingContent = existingContent + '\r\r';
+      }
+      await this.vault.adapter.write(filePath, existingContent + note);
     }
   
     private async createFoldersFromVaultRoot(parentPath: string, folders: string[]): Promise<void> {

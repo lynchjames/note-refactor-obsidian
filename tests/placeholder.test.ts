@@ -36,6 +36,10 @@ $\sqrt{2}$`;
 
 });
 
+describe("New note path", () => {
+
+});
+
 function lineAt(input: string, index: number): string {
     return input.split('\n')[index];
 }
