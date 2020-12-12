@@ -1,4 +1,3 @@
-import { normalizePath } from 'obsidian';
 import { Editor } from 'codemirror';
 import { HEADING_REGEX } from './constants';
 import MomentDateRegex from './moment-date-regex';
@@ -48,7 +47,6 @@ export default class NRDoc {
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
       output = this.templatePlaceholders.newNotePath.replace(output, newNotePath);
-      output = this.templatePlaceholders.newNotePathEncoded.replace(output, normalizePath(newNotePath));
       return output;
     }
 
