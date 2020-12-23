@@ -31,7 +31,9 @@ export default class ModalNoteCreation {
         fileName = this.file.sanitisedFileName(fileName);
         const { currentFile } = this.getCurrentFile();
         const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
-        await this.obsFile.createOrAppendFile(fileName, templatedContent)
+        const filePath = await this.obsFile.createOrAppendFile(fileName, templatedContent)
+        this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.content, this.mode);
+        this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
       }
 
       async append(file: TFile, existingContent?: string) {

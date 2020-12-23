@@ -60,6 +60,7 @@ export default class ObsidianFile {
         } else {
           await this.vault.create(filePath, note);
         }
+        return filePath;
       } catch (error) {
         console.error(error);
       }

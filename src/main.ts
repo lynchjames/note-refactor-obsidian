@@ -3,7 +3,8 @@ import {
   Plugin,
   Vault, 
   DataAdapter,
-  SuggestModal
+  SuggestModal,
+  getLinkpath
 } from 'obsidian';
 import MomentDateRegex from './moment-date-regex';
 import { NoteRefactorSettingsTab } from './settings-tab';
@@ -133,10 +134,10 @@ export default class NoteRefactor extends Plugin {
       note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, fileName, '', note);
     }
 
-    await this.obsFile.createOrAppendFile(fileName, note);
+    const filePath = await this.obsFile.createOrAppendFile(fileName, note);
     this.NRDoc.replaceContent(fileName, doc, mdView.file.name, note, originalNote, mode);
     if(!isMultiple) {
-        await this.app.workspace.openLinkText(fileName, this.obsFile.filePath(this.app.workspace.activeLeaf.view), true);
+        await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }
   }
 
