@@ -28,7 +28,7 @@ export default class NoteRefactor extends Plugin {
 
   async onload() {
     console.log("Loading Note Refactor plugin");
-    this.settings = (await this.loadData()) || new NoteRefactorSettings();
+    this.settings = Object.assign(new NoteRefactorSettings(), await this.loadData());
     this.momentDateRegex = new MomentDateRegex();
     this.obsFile = new ObsidianFile(this.settings, this.app)
     this.file = new NRFile(this.settings);
