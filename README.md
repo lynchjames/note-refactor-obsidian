@@ -31,6 +31,7 @@ This table shows the different use cases for this plugin and how commands and se
 | 2 | 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note set from the first line of the selection | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />False |
 | 3 | 1. Extract a selection into a new note.<br />2. File name for new note set from the first line of the selection.<br />3. First line included in the new note as a heading. | Extract selection to new note - first line as file name | **Exclude First Line**<br />False <br/><br />**Include Heading**<br />True |
 | 4 | 1. Extract a selection into a new note<br />2. File name for new note set from the first line of the selection.<br />3. First line not included in the new note. | Extract selection to new note - first line as file name | **Exclude First Line**<br />True <br/><br /> |
+| 5 | 1. Extract a selection into a new note exactly as it is.<br />2. File name for new note is generated from the **File name prefix** setting. | Extract selection to new note - only prefix as file name | |
 
 ### Splitting
 
@@ -76,6 +77,10 @@ This command copies the selected text into the content of a new note using the f
 This command only copies the selected text into the content of a new note or append to an existing one. The user is prompted to enter a file name for the new note.
 
 ![content only demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Content-Only.gif)
+
+#### Extract selection to new note - prefix only as file name
+
+This command only copies the selected text into the content of a new note or append to an existing one. The filename is automatically generated based on the value of **File name prefix** setting. New note is created silently and will not be shown in a new pane.
 
 ## Configuration
 
