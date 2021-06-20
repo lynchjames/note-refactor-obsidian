@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, MarkdownView, SuggestModal, TFile } from 'obsidian';
+import { App, FuzzyMatch, FuzzySuggestModal, MarkdownView, SuggestModal, TFile } from 'obsidian';
 import ModalNoteCreation from './modal-note-creation';
 const EMPTY_TEXT = 'No files found to append content. Enter to create a new one.'
 const PLACEHOLDER_TEXT = 'Type file to append to or create';
@@ -27,41 +27,36 @@ export default class NoteRefactorModal extends FuzzySuggestModal<TFile>{
         this.emptyStateText = EMPTY_TEXT;
         this.setPlaceholder(PLACEHOLDER_TEXT);
         this.setInstructions(instructions);
-        this.initNewNoteItem();
     }
-        
+
     getItems(): TFile[] {
-        return this.files;
+        const inputName = this.inputEl.value;
+        if(inputName.length == 0 || this.files.filter(f => this.isMatch(f.path, inputName + '.md')).length > 0){
+            return this.files;
+        }
+        const newFile: TFile = {basename: this.inputEl.value, path: undefined, stat: undefined, vault: undefined, extension: undefined, parent: undefined, name: undefined};
+        newFile.path = this.inputEl.value;
+        return [newFile, ...this.files];
     }
     
     getItemText(item: TFile): string {
         this.noSuggestion = false;
-        return item.basename;
-    }
-    
-    onNoSuggestion() {
-        this.noSuggestion = true;
-        this.resultContainerEl.childNodes.forEach(c => c.parentNode.removeChild(c));
-        this.newNoteResult.innerText = this.inputEl.value;
-        this.itemInstructionMessage(this.newNoteResult, 'Enter to create');
-        this.resultContainerEl.appendChild(this.newNoteResult);
-        this.resultContainerEl.appendChild(this.suggestionEmpty);
+        return item.path;
     }
     
     onChooseItem(item: TFile, evt: MouseEvent | KeyboardEvent): void {
-        if(this.noSuggestion) {
+        if(this.noSuggestion || item.vault == undefined) {
             this.modalNoteCreation.create(this.inputEl.value);
         } else {
             this.modalNoteCreation.append(item);
         }
     }
-    
-    initNewNoteItem() {
-        this.newNoteResult = document.createElement('div');
-        this.newNoteResult.addClasses(['suggestion-item', 'is-selected']);
-        this.suggestionEmpty = document.createElement('div');
-        this.suggestionEmpty.addClass('suggestion-empty');
-        this.suggestionEmpty.innerText = EMPTY_TEXT;
+
+    renderSuggestion(item: FuzzyMatch<TFile>, el: HTMLElement) {
+        el.innerText = item.item.path.replace('.md', '');
+        if(item.item.vault == undefined) {
+            this.itemInstructionMessage(el, 'Enter to create new file');
+        }
     }
 
     itemInstructionMessage(resultEl: HTMLElement, message: string) {
@@ -69,6 +64,10 @@ export default class NoteRefactorModal extends FuzzySuggestModal<TFile>{
         el.addClass('suggestion-hotkey');
         el.innerText = message;
         resultEl.appendChild(el);
+    }
+
+    isMatch(input: string, match: string){
+        return input.toLocaleLowerCase() == match.toLocaleLowerCase()
     }
     
 }

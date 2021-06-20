@@ -47,7 +47,7 @@ export default class ModalNoteCreation {
 
       getCurrentFile(): {currentView: MarkdownView, currentFile: TFile} {
         const currentView = this.app.workspace.activeLeaf.view as MarkdownView;
-        const currentFile = currentView.file
+        const currentFile = currentView.file;
         return {currentView, currentFile};
       }
 
