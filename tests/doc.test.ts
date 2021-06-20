@@ -3,7 +3,6 @@ import { assert } from 'chai';
 import NRDoc from '../src/doc';
 import { NoteRefactorSettings } from '../src/settings';
 import { promises as fs } from 'fs';
-import { FileManager, Vault } from 'obsidian';
 const newLocal = './tests/files/test-note.md';
 let doc: NRDoc = null;
 let fileContents:string = '';
@@ -14,7 +13,7 @@ describe("Note content - Content Only", () => {
     before(async () => {
         fileContents = await loadTestFile();
         content = toArray(fileContents, 0, 15);
-        doc = new NRDoc(new NoteRefactorSettings(), new Vault(), new FileManager());
+        doc = new NRDoc(new NoteRefactorSettings(), undefined, undefined);
     });
 
     it("First line content", () => {
