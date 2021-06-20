@@ -33,7 +33,9 @@ export default class ModalNoteCreation {
         const templatedContent = await this.templatedContent(this.content, currentFile, filePath, fileName);
         await this.obsFile.createOrAppendFile(fileName, templatedContent)
         await this.doc.replaceContent(fileName, filePath, this.editor, currentFile, templatedContent, this.content, this.mode);
-        this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
+        if(this.settings.openNewNote){
+          this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
+        }
       }
 
       async append(file: TFile, existingContent?: string) {
@@ -42,7 +44,9 @@ export default class ModalNoteCreation {
         existingContent = existingContent ?? (await this.app.vault.read(file) + '\r\r');
         await this.app.vault.modify(file, existingContent + templatedContent);
         await this.doc.replaceContent(file.basename, file.path, this.editor, currentFile, templatedContent, this.content, this.mode);
-        this.app.workspace.openLinkText(file.basename, getLinkpath(file.path), true);
+        if(this.settings.openNewNote){
+          this.app.workspace.openLinkText(file.basename, getLinkpath(file.path), true);
+        }
       }
 
       getCurrentFile(): {currentView: MarkdownView, currentFile: TFile} {

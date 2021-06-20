@@ -177,7 +177,7 @@ export default class NoteRefactor extends Plugin {
     }
     await this.obsFile.createOrAppendFile(fileName, note);
     await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);
-    if(!isMultiple) {
+    if(!isMultiple && this.settings.openNewNote) {
         await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }
   }

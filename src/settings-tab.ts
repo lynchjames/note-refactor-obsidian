@@ -130,6 +130,15 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
           this.display();
         }));
 
+    new Setting(containerEl)
+      .setName('Open New Note')
+      .setDesc('Open the new note in a new pane')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.openNewNote)
+        .onChange((value) => {
+          this.plugin.settings.openNewNote = value;
+          this.plugin.saveData(this.plugin.settings);
+        }));
+
     if (this.plugin.settings.includeFirstLineAsNoteHeading) {
       new Setting(containerEl)
         .setName('Heading format')
