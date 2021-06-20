@@ -3,7 +3,7 @@ name: CI Test
 on:
   pull_request:
       branches:
-        - master
+        - main
   push:
     # Sequence of patterns matched against refs/tags
     branches:
