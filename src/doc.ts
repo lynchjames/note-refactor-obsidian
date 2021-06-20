@@ -1,4 +1,4 @@
-import { Editor } from 'codemirror';
+import { Editor, FileManager, TFile, Vault } from 'obsidian';
 import { HEADING_REGEX } from './constants';
 import MomentDateRegex from './moment-date-regex';
 import { NotePlaceholders } from './placeholder';
@@ -9,24 +9,30 @@ export default class NRDoc {
     private settings: NoteRefactorSettings;
     private templatePlaceholders: NotePlaceholders;
     private momentRegex: MomentDateRegex;
+    private vault: Vault;
+    private fileManager: FileManager;
     
-    constructor(settings: NoteRefactorSettings){
+    constructor(settings: NoteRefactorSettings, vault: Vault, fileManager: FileManager){
         this.settings = settings;
+        this.vault = vault;
+        this.fileManager = fileManager;
         this.templatePlaceholders = new NotePlaceholders();
         this.momentRegex = new MomentDateRegex();
     }
 
     removeNoteRemainder(doc:Editor, text:string): void {
         const currentLine = doc.getCursor();
-        const endPosition = doc.posFromIndex(doc.getValue().length);
+        const endPosition = doc.offsetToPos(doc.getValue().length);
         doc.replaceRange(text, currentLine, endPosition);
     }
 
-    replaceContent(fileName:string, doc:Editor, currentNoteTitle: string, content: string, originalContent: string, mode: ReplaceMode): void {
+    async replaceContent(fileName: string, filePath: string, doc:Editor, currentNote: TFile, content: string, originalContent: string, mode: ReplaceMode): Promise<void> {
         const transclude = this.settings.transcludeByDefault ? '!' : '';
-        let contentToInsert = `${transclude}[[${fileName}]]`;
+        const link = await this.markdownLink(filePath);
+        const currentNoteLink = await this.markdownLink(currentNote.path);
+        let contentToInsert = transclude + link;
         
-        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNoteTitle, fileName, '', content);
+        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNote.basename, currentNoteLink, fileName, link, '', content);
 
         if(mode === 'split'){ 
             this.removeNoteRemainder(doc, contentToInsert);
@@ -37,14 +43,23 @@ export default class NRDoc {
         }
     }
 
-    templatedContent(input: string, template: string, currentNoteTitle: string, newNoteTitle: string, newNotePath: string, newNoteContent: string): string {
+    async markdownLink(filePath: string){
+      const file = await this.vault.getMarkdownFiles().filter(f => f.path === filePath)[0];
+      const link = await this.fileManager.generateMarkdownLink(file, '', '', '');
+      console.log('Settings aware md link', link);
+      return link;
+    }
+
+    templatedContent(input: string, template: string, currentNoteTitle: string, currentNoteLink: string, newNoteTitle: string, newNoteLink: string, newNotePath: string, newNoteContent: string): string {
       if(template === undefined || template === ''){
         return input;
       }
       let output = template;
       output = this.momentRegex.replace(output);
       output = this.templatePlaceholders.title.replace(output, currentNoteTitle);
+      output = this.templatePlaceholders.link.replace(output, currentNoteLink);
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
+      output = this.templatePlaceholders.newNoteLink.replace(output, newNoteLink);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
       output = this.templatePlaceholders.newNotePath.replace(output, newNotePath);
       return output;
@@ -59,7 +74,7 @@ export default class NRDoc {
     noteRemainder(doc:Editor): string[] {
       doc.setCursor(doc.getCursor().line, 0);
       const currentLine = doc.getCursor();
-      const endPosition = doc.posFromIndex(doc.getValue().length);
+      const endPosition = doc.offsetToPos(doc.getValue().length);
       const content = doc.getRange(currentLine, endPosition);
       const trimmedContent = content.trim();
       return trimmedContent.split('\n');

@@ -1,7 +1,6 @@
 import NRDoc, { ReplaceMode } from './doc';
 import NRFile from './file';
-import { App, getLinkpath, MarkdownView, TFile, View } from 'obsidian';
-import { Editor } from 'codemirror';
+import { App, Editor, getLinkpath, MarkdownView, TFile } from 'obsidian';
 import ObsidianFile from './obsidian-file';
 import { NoteRefactorSettings } from './settings';
 
@@ -16,7 +15,7 @@ export default class ModalNoteCreation {
     mode: ReplaceMode;
     fileNameInput: HTMLInputElement;
     
-    constructor(app: App, settings: NoteRefactorSettings, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: CodeMirror.Editor, mode: ReplaceMode) {
+    constructor(app: App, settings: NoteRefactorSettings, doc :NRDoc, file: NRFile, obsFile:ObsidianFile, content: string, editor: Editor, mode: ReplaceMode) {
       this.app = app;
       this.settings = settings;
       this.content = content;
@@ -30,18 +29,19 @@ export default class ModalNoteCreation {
       async create(fileName: string) : Promise<void> {
         fileName = this.file.sanitisedFileName(fileName);
         const { currentFile } = this.getCurrentFile();
-        const templatedContent = this.templatedContent(this.content, currentFile.basename, fileName);
-        const filePath = await this.obsFile.createOrAppendFile(fileName, templatedContent)
-        this.doc.replaceContent(fileName, this.editor, currentFile.name, templatedContent, this.content, this.mode);
+        const filePath = await this.obsFile.createOrAppendFile(fileName, '');
+        const templatedContent = await this.templatedContent(this.content, currentFile, filePath, fileName);
+        await this.obsFile.createOrAppendFile(fileName, templatedContent)
+        await this.doc.replaceContent(fileName, filePath, this.editor, currentFile, templatedContent, this.content, this.mode);
         this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
       }
 
       async append(file: TFile, existingContent?: string) {
         const { currentView, currentFile } = this.getCurrentFile();
-        const templatedContent = this.templatedContent(this.content, currentFile.basename, file.basename);
+        const templatedContent = await this.templatedContent(this.content, currentFile, file.path, file.basename);
         existingContent = existingContent ?? (await this.app.vault.read(file) + '\r\r');
         await this.app.vault.modify(file, existingContent + templatedContent);
-        this.doc.replaceContent(file.basename, this.editor, currentFile.name, templatedContent, this.content, this.mode);
+        await this.doc.replaceContent(file.basename, file.path, this.editor, currentFile, templatedContent, this.content, this.mode);
         this.app.workspace.openLinkText(file.basename, getLinkpath(file.path), true);
       }
 
@@ -51,9 +51,11 @@ export default class ModalNoteCreation {
         return {currentView, currentFile};
       }
 
-      private templatedContent(note: string, currentFileName: string, fileName: string) {
+      private async templatedContent(note: string, curerntFile: TFile, filePath: string, fileName: string) {
         if(this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
-          return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, currentFileName, fileName, '', note);
+          const currentFileLink = await this.doc.markdownLink(curerntFile.path);
+          const fileLink = await this.doc.markdownLink(filePath);
+          return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, curerntFile.basename, currentFileLink, fileName, fileLink, '', note);
         }
         return note;
       }

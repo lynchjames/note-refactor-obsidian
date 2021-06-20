@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import NRDoc from '../src/doc';
 import { NoteRefactorSettings } from '../src/settings';
 import { promises as fs } from 'fs';
+import { FileManager, Vault } from 'obsidian';
 const newLocal = './tests/files/test-note.md';
 let doc: NRDoc = null;
 let fileContents:string = '';
@@ -13,7 +14,7 @@ describe("Note content - Content Only", () => {
     before(async () => {
         fileContents = await loadTestFile();
         content = toArray(fileContents, 0, 15);
-        doc = new NRDoc(new NoteRefactorSettings());
+        doc = new NRDoc(new NoteRefactorSettings(), new Vault(), new FileManager());
     });
 
     it("First line content", () => {
@@ -39,7 +40,7 @@ describe("Note content - First Line as File Name, exclude first line", () => {
         fileContents = await loadTestFile();
         const settings = new NoteRefactorSettings();
         settings.excludeFirstLineInNote = true;
-        doc = new NRDoc(settings);
+        doc = new NRDoc(settings, undefined, undefined);
         content = toArray(fileContents, 0, 15);
     });
     
@@ -79,7 +80,7 @@ describe("Note content - First Line as File Name, first line as heading", () => 
         const settings = new NoteRefactorSettings();
         settings.includeFirstLineAsNoteHeading = true;
         settings.headingFormat = '#';
-        doc = new NRDoc(settings);
+        doc = new NRDoc(settings, undefined, undefined);
         content = toArray(fileContents, 0, 15);
     });
     
@@ -117,7 +118,7 @@ describe("Note content - First Line as File Name, first line as heading (modifie
         const settings = new NoteRefactorSettings();
         settings.includeFirstLineAsNoteHeading = true;
         settings.headingFormat = '#';
-        doc = new NRDoc(settings);
+        doc = new NRDoc(settings, undefined, undefined);
         content = toArray(fileContents, 4, 28);
     });
     
