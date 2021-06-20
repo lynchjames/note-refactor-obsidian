@@ -46,7 +46,6 @@ export default class NRDoc {
     async markdownLink(filePath: string){
       const file = await this.vault.getMarkdownFiles().filter(f => f.path === filePath)[0];
       const link = await this.fileManager.generateMarkdownLink(file, '', '', '');
-      console.log('Settings aware md link', link);
       return link;
     }
 
