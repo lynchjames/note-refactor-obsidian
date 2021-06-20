@@ -147,7 +147,7 @@ export default class NoteRefactor extends Plugin {
     const fileName = this.file.fileNamePrefix(); // Only prefix is used for the note file name
     const originalNote = this.NRDoc.noteContent(header, contentArr);
     let note = originalNote;
-    const filePath = await this.obsFile.createOrAppendFile(fileName, note);
+    const filePath = await this.obsFile.createOrAppendFile(fileName, '');
 
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');
@@ -168,7 +168,7 @@ export default class NoteRefactor extends Plugin {
     const fileName = this.file.sanitisedFileName(header);
     const originalNote = this.NRDoc.noteContent(header, contentArr);
     let note = originalNote;
-    const filePath = await this.obsFile.createOrAppendFile(fileName, note);
+    const filePath = await this.obsFile.createOrAppendFile(fileName, '');
 
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');

@@ -83,7 +83,7 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
       .setDesc(this.tempalteDescriptionContent('The template used to generate the link to the extracted note. This overrides the Transclude by Default setting.'))
       .addTextArea((text) => {
         text
-          .setPlaceholder("Example:\n\nSee also -> [[{{new_note_title}}]]")
+          .setPlaceholder("Example:\n\nSee also -> {{new_note_link}}")
           .setValue(this.plugin.settings.noteLinkTemplate || '')
           .onChange((value) => {
             this.plugin.settings.noteLinkTemplate = value;
@@ -99,7 +99,7 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
       .setDesc(this.tempalteDescriptionContent('The template used to generate the content for the refactored note.'))
       .addTextArea((text) => {
         text
-          .setPlaceholder('Example:\n\n{{new_note_content}}\n\n---\nLink to original note: [[{{title}}]]')
+          .setPlaceholder('Example:\n\n{{new_note_content}}\n\n---\nLink to original note: {{link}}')
           .setValue(this.plugin.settings.refactoredNoteTemplate || '')
           .onChange((value) => {
             this.plugin.settings.refactoredNoteTemplate = value;
