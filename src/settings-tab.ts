@@ -152,6 +152,15 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
               this.plugin.saveData(this.plugin.settings);
             }));
     }
+
+    new Setting(containerEl)
+      .setName('Normalize heading levels')
+      .setDesc('When content has been extracted/split into a new note, normalize the levels of the headings')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.normalizeHeaderLevels)
+        .onChange((value) => {
+          this.plugin.settings.normalizeHeaderLevels = value;
+          this.plugin.saveData(this.plugin.settings);
+        }));
   }
 
   private tempalteDescriptionContent(introText: string): DocumentFragment {

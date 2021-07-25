@@ -120,6 +120,37 @@ export default class NRDoc {
         //Adds first line back into content if it is not to be included as a header or if the command is content only
         contentArr.unshift(firstLine);
       }
+      if(this.settings.normalizeHeaderLevels){
+        contentArr = this.normalizeHeadingLevels(contentArr);
+      }
       return contentArr.join('\n').trim();
+    }
+
+    normalizeHeadingLevels(contentArr:string[]): string[] {
+      const minHeadingLevel = Math.min(...contentArr.map(line => this.headingLevel(line)).filter(level => level > 0));
+      if(minHeadingLevel > 1) {
+        contentArr.forEach((line, i) => {
+          const level = this.headingLevel(line);
+          if (level > 0) {
+            contentArr[i] = line.substr(minHeadingLevel - 1);
+          }
+        });
+      }
+      return contentArr;
+    }
+
+    headingLevel(line: string): number {
+      let headingLevel = 0;
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === '#') {
+          headingLevel++;
+        } else if(line[i] === ' '){
+          break;
+        } else {
+          headingLevel = 0;
+          break;
+        }
+      }
+      return headingLevel;
     }
 }
