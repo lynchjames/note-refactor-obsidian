@@ -149,6 +149,21 @@ The following placeholders are supported and will be replaced with dynamic value
 - `{{new_note_title}}` the title of the new note.
 - `{{new_note_content}}` the refactored content for the new note.
 
+### Normalize Heading Levels
+
+This setting normalizes the levels of the headings in an extracted note.
+
+For example,
+```
+## Heading 2
+### Heading 3
+```
+becomes
+```
+# Heading 2
+## Heading 3
+```
+
 ## Compatibility
 
 Custom plugins are only available for Obsidian v0.9.7+.
