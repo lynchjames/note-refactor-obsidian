@@ -191,7 +191,7 @@ A check is done to avoid overwriting of existing files but...
 Credit to [MrJackphil](https://github.com/mrjackphil), this plugin is based on [the code snippet](https://forum.obsidian.md/t/code-snippet-extract-note/6698) he created.
 
 ## For developers
-Pull requests are both weclcome and appreciated. 😀
+Pull requests are both welcomed and appreciated. 😀
 
 If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
 
