@@ -33,6 +33,38 @@ describe("Note content - Content Only", () => {
 
 });
 
+describe("Note content - Content Only - Normalize header levels", () => {
+
+    before(async () => {
+        fileContents = await loadTestFile();
+        content = toArray(fileContents, 42, 51);
+        const settings = new NoteRefactorSettings();
+        settings.normalizeHeaderLevels = true;
+        doc = new NRDoc(settings, undefined, undefined);
+    });
+
+    it("First line content", () => {
+        const noteContent = doc.noteContent(content[0], content.slice(1), true);
+        assert.equal(firstLine(noteContent), "# I have questions.");
+    });
+
+    it("Header 3 content", () => {
+        const noteContent = doc.noteContent(content[0], content.slice(1), true);
+        assert.equal(toArray(noteContent)[4], "## Header 3");
+    });
+
+    it("Last line content", () => {
+        const noteContent = doc.noteContent(content[0], content.slice(1), true);
+        assert.equal(lastLine(noteContent), "This is for testing normalizing header levels.");
+    });
+
+    it("Character count", () => {
+        const noteContent = doc.noteContent(content[0], content.slice(1), true);
+        assert.equal(noteContent.length, 232);
+    });
+
+});
+
 describe("Note content - First Line as File Name, exclude first line", () => {
 
     before(async () => {

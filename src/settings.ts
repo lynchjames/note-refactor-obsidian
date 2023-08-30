@@ -11,6 +11,7 @@ export class NoteRefactorSettings {
     transcludeByDefault: boolean = false;
     noteLinkTemplate: string = '';
     refactoredNoteTemplate: string = '';
+    normalizeHeaderLevels: boolean = false;
   }
   
 export enum Location {
