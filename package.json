@@ -24,7 +24,7 @@
     "ignore-styles": "^5.0.1",
     "jsdom": "^16.6.0",
     "jsdom-global": "^3.0.2",
-    "mocha": "^8.4.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
     "rollup": "^2.52.1",
