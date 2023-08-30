@@ -1,4 +1,3 @@
-import 'mocha';
 import { assert } from 'chai';
 import { NotePlaceholders } from '../src/placeholder';
 let placholders = new NotePlaceholders();
@@ -8,7 +7,7 @@ let output: string = '';
 
 describe("Regression - Issue 28", () => {
 
-    before(async () => {
+    beforeAll(async () => {
         input = `{{new_note_content}}`;
         replacement = 
 `# Issue 28 - New Note

@@ -1,4 +1,3 @@
-import 'mocha';
 import { assert } from 'chai';
 import NRDoc from '../src/doc';
 import { NoteRefactorSettings } from '../src/settings';
@@ -10,7 +9,7 @@ let content: string[] = [];
 
 describe("Note content - Content Only", () => {
 
-    before(async () => {
+    beforeAll(async () => {
         fileContents = await loadTestFile();
         content = toArray(fileContents, 0, 15);
         doc = new NRDoc(new NoteRefactorSettings(), undefined, undefined);
@@ -35,7 +34,7 @@ describe("Note content - Content Only", () => {
 
 describe("Note content - Content Only - Normalize header levels", () => {
 
-    before(async () => {
+    beforeAll(async () => {
         fileContents = await loadTestFile();
         content = toArray(fileContents, 42, 51);
         const settings = new NoteRefactorSettings();
@@ -67,7 +66,7 @@ describe("Note content - Content Only - Normalize header levels", () => {
 
 describe("Note content - First Line as File Name, exclude first line", () => {
 
-    before(async () => {
+    beforeAll(async () => {
         fileContents = await loadTestFile();
         const settings = new NoteRefactorSettings();
         settings.excludeFirstLineInNote = true;
@@ -106,7 +105,7 @@ describe("Note content - First Line as File Name, first line as heading", () => 
     let fileContents:string = '';
     let content: string[] = [];
 
-    before(async () => {
+    beforeAll(async () => {
         fileContents = await loadTestFile();
         const settings = new NoteRefactorSettings();
         settings.includeFirstLineAsNoteHeading = true;
@@ -144,7 +143,7 @@ describe("Note content - First Line as File Name, first line as heading", () => 
 
 describe("Note content - First Line as File Name, first line as heading (modified heading)", () => {
 
-    before(async () => {
+    beforeAll(async () => {
         fileContents = await loadTestFile();
         const settings = new NoteRefactorSettings();
         settings.includeFirstLineAsNoteHeading = true;

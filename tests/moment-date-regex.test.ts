@@ -1,4 +1,3 @@
-import 'mocha';
 import { assert } from 'chai';
 import { mockDate } from './mocks/date'
 import MomentDateRegex from '../src/moment-date-regex';
@@ -8,7 +7,7 @@ const momentRegex = new MomentDateRegex();
 describe("Date formatting", () => {
     let resetDateMock:() => void;
 
-    before(async () => {
+    beforeAll(async () => {
         resetDateMock = mockDate(date);
     });
     
@@ -54,7 +53,7 @@ describe("Date formatting", () => {
         assert.equal(momentRegex.replace(input), expectedOuput);
     });
 
-    after(() => {
+    afterAll(() => {
         resetDateMock();
     });
 });

@@ -1,4 +1,3 @@
-import 'mocha';
 import { assert } from 'chai';
 import { mockDate}  from './mocks/date';
 import NRFile from '../src/file';
@@ -12,7 +11,7 @@ describe("File Name Prefix", () => {
     let resetDateMock:() => void;
     let settings = new NoteRefactorSettings();
     
-    before(async () => {
+    beforeAll(async () => {
         file = new NRFile(settings);
         resetDateMock = mockDate(date);
     });
@@ -53,7 +52,7 @@ describe("File Name Prefix", () => {
         assert.equal(prefix, '');
     });
 
-    after(() => {
+    afterAll(() => {
         resetDateMock();
     });
 });
@@ -63,7 +62,7 @@ describe("File Name Sanitisation", () => {
     let resetDateMock:() => void;
     let settings = new NoteRefactorSettings();
 
-    before(async () => {
+    beforeAll(async () => {
         file = new NRFile(settings);
         resetDateMock = mockDate(date);
     });
@@ -115,7 +114,7 @@ describe("File Name Sanitisation", () => {
     });
 
 
-    after(() => {
+    afterAll(() => {
         resetDateMock();
     });
 });

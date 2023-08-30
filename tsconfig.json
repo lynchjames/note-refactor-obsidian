@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "inlineSources": true,
     "module": "ESNext",
     "target": "es5",
     "allowJs": true,
