@@ -1,87 +1,76 @@
-name: Release Build
+# Creates a new GitHub Release when a tag is pushed
+# See https://docs.obsidian.md/Plugins/Releasing/Submit+your+plugin#Step+2+Create+a+release
+# Tag should be in the format of x.y.z without `v` prefix
+# For example `1.0.0` is a valid tag, but `v1.0.0` is not
+name: Release
+
+permissions:
+  contents: write
 
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-    - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 env:
-  PLUGIN_NAME: note-refactor-obsidian # Change this to the name of your plugin-id folder
+  # IMPORTANT: Update this with the name of your plugin
+  PLUGIN_NAME: note-refactor-obsidian
 
 jobs:
-  build:
-
+  release:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '16.x' # You might need to adjust this value to your own version
-    - name: Build
-      id: build
-      run: | 
-        npm install
-        npm run build --if-present
-        mkdir ${{ env.PLUGIN_NAME }}
-        cp dist/main.js manifest.json ${{ env.PLUGIN_NAME }}
-        zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
-        ls
-        echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
-    # - name: Test
-    #   id: test
-    #   run: |
-    #     npm run test
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: ${{ github.ref }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: false
-        prerelease: false
-    - name: Upload zip file
-      id: upload-zip
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./${{ env.PLUGIN_NAME }}.zip 
-        asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip 
-        asset_content_type: application/zip
-    - name: Upload main.js
-      id: upload-main
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./dist/main.js
-        asset_name: main.js
-        asset_content_type: text/javascript
-    - name: Upload manifest.json
-      id: upload-manifest
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./manifest.json
-        asset_name: manifest.json
-        asset_content_type: application/json
-    - name: Upload styles.css
-      id: upload-css
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./styles.css
-        asset_name: styles.css
-        asset_content_type: text/css
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Build and zip
+        id: build
+        run: |
+          tag=${GITHUB_REF#refs/*/}
+          # Set tag as output for following steps
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          # Update version in manifest.json and package.json
+          jq --arg tag "$tag" '.version = $tag' manifest.json >> tmp.$$.json && mv tmp.$$.json manifest.json
+          jq --arg tag "$tag" '.version = $tag' package.json >> tmp.$$.json && mv tmp.$$.json package.json
+          # Build and zip release
+          npm install
+          npm run build
+          mkdir ${{ env.PLUGIN_NAME }}
+          cp styles.css main.js manifest.json ${{ env.PLUGIN_NAME }}
+          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+      - name: Commit version changes
+        uses: EndBug/add-and-commit@1bad3abcf0d6ec49a5857d124b0bfb52dc7bb081
+        with:
+          default_author: github_actor
+          add: 'manifest.json package.json package-lock.json'
+          message: 'Release ${{ steps.build.outputs.tag }}'
+          push: 'origin HEAD:${{ github.event.repository.default_branch }} --force'
+          # Override existing tag with new tag that has version bump
+          tag: '${{ steps.build.outputs.tag }} --force'
+          tag_push: '--force'
+
+      - name: Release with files
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+        with:
+          name: ${{ steps.build.outputs.tag }}
+          body: "*Release of ${{ env.PLUGIN_NAME }} v${{ steps.build.outputs.tag }} auto-created by [release.yml](.github/workflows/release.yml)*"
+          files: |
+            ${{ env.PLUGIN_NAME }}.zip
+            main.js
+            manifest.json
+            styles.css
+      - name: Upload artifacts for debugging
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PLUGIN_NAME }}
+          path: |
+            ${{ env.PLUGIN_NAME }}.zip
+            main.js
+            manifest.json
+            styles.css
