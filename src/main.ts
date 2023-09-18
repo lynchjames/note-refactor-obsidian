@@ -116,7 +116,8 @@ export default class NoteRefactor extends Plugin {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.editor;
       const headingNotes = this.NRDoc.contentSplitByHeading(doc, headingLevel);
-      headingNotes.forEach(hn => this.createNoteWithFirstLineAsFileName(hn, mdView, doc, 'replace-headings', true));
+      const dedupedFileNames = this.file.ensureUniqueFileNames(headingNotes);
+      headingNotes.forEach((hn, i) => this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], hn, mdView, doc, 'replace-headings', true));
   }
 
   async extractSelectionFirstLine(mode: ReplaceMode): Promise<void> {
@@ -127,7 +128,7 @@ export default class NoteRefactor extends Plugin {
       const selectedContent = mode === 'split' ? this.NRDoc.noteRemainder(doc) : this.NRDoc.selectedContent(doc);
       if(selectedContent.length <= 0) { return }
 
-      await this.createNoteWithFirstLineAsFileName(selectedContent, mdView, doc, mode, false);
+      await this.createNoteWithFirstLineAsFileName(selectedContent[0], selectedContent, mdView, doc, mode, false);
   }
 
   async extractSelectionAutogenerate(mode: ReplaceMode): Promise<void> {
@@ -162,11 +163,11 @@ export default class NoteRefactor extends Plugin {
     }
   }
 
-  private async createNoteWithFirstLineAsFileName(selectedContent: string[], mdView: MarkdownView, doc: Editor, mode: ReplaceMode, isMultiple: boolean) {
-    const [header, ...contentArr] = selectedContent;
+  private async createNoteWithFirstLineAsFileName(dedupedHeader: string, selectedContent: string[], mdView: MarkdownView, doc: Editor, mode: ReplaceMode, isMultiple: boolean) {
+    const [originalHeader, ...contentArr] = selectedContent;
 
-    const fileName = this.file.sanitisedFileName(header);
-    const originalNote = this.NRDoc.noteContent(header, contentArr);
+    const fileName = this.file.sanitisedFileName(dedupedHeader);
+    const originalNote = this.NRDoc.noteContent(originalHeader, contentArr);
     let note = originalNote;
     const filePath = await this.obsFile.createOrAppendFile(fileName, '');
 

@@ -3,6 +3,7 @@ import { NoteRefactorSettings } from './settings';
 import MomentDateRegex from './moment-date-regex'
 
 export default class NRFile {
+    
     private settings: NoteRefactorSettings;
     private momentDateRegex: MomentDateRegex;
 
@@ -20,5 +21,16 @@ export default class NRFile {
 
     fileNamePrefix(): string {
       return this.settings.fileNamePrefix ? this.momentDateRegex.replace(this.settings.fileNamePrefix) : '';
+    }
+
+    ensureUniqueFileNames(headingNotes: string[][]): string[] {
+      const fileNames:string[] = [];
+      const deduped = headingNotes.map((hn) => {
+        const fileName = this.sanitisedFileName(hn[0]);
+        const duplicates = fileNames.filter(fn => fn == fileName);
+        fileNames.push(fileName);
+        return duplicates.length >= 1 ? `${fileName}${duplicates.length + 1}` : fileName;
+      });
+      return deduped;
     }
 }
