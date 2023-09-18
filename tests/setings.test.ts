@@ -1,26 +1,26 @@
-import { assert } from 'chai';
+import {describe, expect, beforeAll, afterAll} from '@jest/globals';
 import { Location, NoteRefactorSettings } from '../src/settings';
 
 const settings = new NoteRefactorSettings();
 describe("Note Refactor Settings defaults", () => {
 
     it("New file location ", () => {
-        assert.equal(settings.newFileLocation, Location.VaultFolder);
+        expect(settings.newFileLocation).toBe(Location.VaultFolder);
     });
 
     it("Custom folder ", () => {
-        assert.equal(settings.customFolder, '');
+        expect(settings.customFolder).toBe('');
     });
 
     it("Exclude first line in note", () => {
-        assert.isFalse(settings.excludeFirstLineInNote);
+        expect(settings.excludeFirstLineInNote).toBeFalsy();
     });
 
     it("Include first line as note heading", () => {
-        assert.isFalse(settings.includeFirstLineAsNoteHeading);
+        expect(settings.includeFirstLineAsNoteHeading).toBeFalsy();
     });
 
     it("Heading format", () => {
-        assert.equal(settings.headingFormat, '#');
+        expect(settings.headingFormat).toBe('#');
     });
 });

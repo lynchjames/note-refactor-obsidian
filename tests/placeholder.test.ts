@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import {describe, expect, beforeAll} from '@jest/globals';
 import { NotePlaceholders } from '../src/placeholder';
 let placholders = new NotePlaceholders();
 let input:string = '';
@@ -20,17 +20,17 @@ $\sqrt{2}$`;
     
     it("Should preserve double $$ (case 1)", () => {
         output = placholders.newNoteContent.replace(input, replacement);
-        assert.equal(lineAt(output, 1), "$$\frac{a}{b}$$");
+        expect(lineAt(output, 1)).toBe("$$\frac{a}{b}$$");
     });
 
     it("Should preserve double $$ (case 2)", () => {
         output = placholders.newNoteContent.replace(input, replacement);
-        assert.equal(lineAt(output, 3), "$$a^2 + b^2 = c^2$$");
+        expect(lineAt(output, 3)).toBe("$$a^2 + b^2 = c^2$$");
     });
 
     it("Should preserve single $", () => {
         output = placholders.newNoteContent.replace(input, replacement);
-        assert.equal(lineAt(output, 5), "$\sqrt{2}$");
+        expect(lineAt(output, 5)).toBe("$\sqrt{2}$");
     });
 
 });
