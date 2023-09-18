@@ -42,7 +42,7 @@ jobs:
           npm install
           npm run build
           mkdir ${{ env.PLUGIN_NAME }}
-          cp styles.css dist/main.js manifest.json ${{ env.PLUGIN_NAME }}
+          cp styles.css main.js manifest.json ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
       - name: Commit version changes
         uses: EndBug/add-and-commit@1bad3abcf0d6ec49a5857d124b0bfb52dc7bb081

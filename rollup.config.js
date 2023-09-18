@@ -7,7 +7,7 @@ const TEST_VAULT = 'test-vault/.obsidian/plugins/note-refactor-obsidian';
 export default {
   input: 'src/main.ts',
   output: {
-    dir: 'dist/',
+    dir: './',
     sourcemap: 'inline',
     format: 'cjs',
     exports: 'default'
@@ -19,7 +19,7 @@ export default {
     commonjs(),
     copy({
       targets: [
-        { src: 'dist/main.js', dest: TEST_VAULT },
+        { src: 'main.js', dest: TEST_VAULT },
         { src: ['manifest.json', 'styles.css'], dest: TEST_VAULT }
       ], flatten: true
     })
