@@ -94,6 +94,24 @@ export default class NoteRefactor extends Plugin {
       name: 'Split note by headings - H3',
       callback: () => this.editModeGuard(() => this.splitOnHeading(3)),
     });
+    
+    this.addCommand({
+      id: 'app:split-note-by-heading-h4',
+      name: 'Split note by headings - H4',
+      callback: () => this.editModeGuard(() => this.splitOnHeading(4)),
+    });
+
+    this.addCommand({
+      id: 'app:split-note-by-heading-h5',
+      name: 'Split note by headings - H5',
+      callback: () => this.editModeGuard(() => this.splitOnHeading(5)),
+    });
+
+    this.addCommand({
+      id: 'app:split-note-by-heading-h6',
+      name: 'Split note by headings - H6',
+      callback: () => this.editModeGuard(() => this.splitOnHeading(6)),
+    });
 
     this.addSettingTab(new NoteRefactorSettingsTab(this.app, this));
   }
