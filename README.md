@@ -57,9 +57,9 @@ This command splits the current note into a new note from the current line using
 
 This command splits the current note into a new note, or append to an existing one, from the current line. The user is prompted to enter a file name for the new note.
 
-#### Split note by headings - H1, H2, H3
+#### Split note by headings - H1, H2, H3, H4, H5, H6
 
-This command splits the current note into a new note for every heading at the level selected (H1, H2 or H3) using the heading as the file name for each new note.
+This command splits the current note into a new note for every heading at the level selected (H1, H2, H3, H4, H5, or H6) using the heading as the file name for each new note.
 
 ![split by headings demo](https://raw.githubusercontent.com/lynchjames/note-refactor-obsidian/master/images/Note-Refactor-Demo-Split-by-Headings.gif)
 
