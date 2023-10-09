@@ -59,7 +59,7 @@ export default class ModalNoteCreation {
         if(this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
           const currentFileLink = await this.doc.markdownLink(curerntFile.path);
           const fileLink = await this.doc.markdownLink(filePath);
-          return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, curerntFile.basename, currentFileLink, fileName, fileLink, '', fileName, note);
+          return this.doc.templatedContent(note, this.settings.refactoredNoteTemplate, curerntFile.basename, currentFileLink, fileName, fileLink, '', note, fileName);
         }
         return note;
       }
