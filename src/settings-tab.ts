@@ -169,7 +169,7 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
     descEl.appendChild(document.createElement('br'));
     descEl.appendText('Supported placeholders:');
     descEl.appendChild(document.createElement('br'));
-    descEl.appendText('{{date}} {{title}} {{link}} {{new_note_title}} {{new_note_link}} {{new_note_content}}');
+    descEl.appendText('{{date}} {{title}} {{link}} {{new_note_title}} {{new_note_link}} {{new_note_content}} {{new_title}}');
     return descEl;
   }
 
