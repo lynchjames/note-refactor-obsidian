@@ -5,7 +5,7 @@ import { NotePlaceholders } from './placeholder';
 import { NoteRefactorSettings } from './settings';
 export type ReplaceMode = 'split' | 'replace-selection' | 'replace-headings';
 
-export default class  {
+export default class NRDoc {
     private settings: NoteRefactorSettings;
     private templatePlaceholders: NotePlaceholders;
     private momentRegex: MomentDateRegex;
