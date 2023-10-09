@@ -137,7 +137,7 @@ The following placeholders are supported and will be replaced with dynamic value
 - `{{title}}` the title of the original note.
 - `{{new_note_title}}` the title of the new note.
 - `{{new_note_content}}` the refactored content for the new note.
-- `{{new_title}}` the title of the new note.
+- `{{new_title}}` the title of the new note without prefix.
 
 ### Refactored Note Template
 
@@ -149,7 +149,7 @@ The following placeholders are supported and will be replaced with dynamic value
 - `{{title}}` the title of the original note.
 - `{{new_note_title}}` the title of the new note.
 - `{{new_note_content}}` the refactored content for the new note.
-- `{{new_title}}` the title of the new note.
+- `{{new_title}}` the title of the new note without prefix.
 
 ### Normalize Heading Levels
 
