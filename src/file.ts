@@ -15,6 +15,11 @@ export default class NRFile {
 		const headerRegex = FILE_NAME_REGEX;
 		const prefix = this.fileNamePrefix();
 		const checkedPrefix = unsanitisedFilename.startsWith(prefix) ? "" : prefix;
+
+		if(this.settings.onlyUsePrefixAsFileName){
+			return checkedPrefix;
+		}
+		
 		return (
 			checkedPrefix +
 			unsanitisedFilename.replace(headerRegex, "").trim().slice(0, 255)
