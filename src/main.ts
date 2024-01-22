@@ -147,17 +147,18 @@ export default class NoteRefactor extends Plugin {
 
     const fileName = this.file.fileNamePrefix(); // Only prefix is used for the note file name
     const originalNote = this.NRDoc.noteContent(header, contentArr);
+    const newTitle = this.file.getNewTitle(header);
     let note = originalNote;
     const filePath = await this.obsFile.createOrAppendFile(fileName, '');
 
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');
       const newNoteLink = await this.NRDoc.markdownLink(filePath);
-      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
+      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note, newTitle);
     }
 
     await this.obsFile.createOrAppendFile(fileName, note);
-    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);
+    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, newTitle, mode);
     if(!isMultiple) {
         await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }
@@ -167,6 +168,7 @@ export default class NoteRefactor extends Plugin {
     const [originalHeader, ...contentArr] = selectedContent;
 
     const fileName = this.file.sanitisedFileName(dedupedHeader);
+    const newTitle = this.file.getNewTitle(dedupedHeader);
     const originalNote = this.NRDoc.noteContent(originalHeader, contentArr);
     let note = originalNote;
     const filePath = await this.obsFile.createOrAppendFile(fileName, '');
@@ -174,10 +176,10 @@ export default class NoteRefactor extends Plugin {
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');
       const newNoteLink = await this.NRDoc.markdownLink(filePath);
-      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
+      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note, newTitle);
     }
     await this.obsFile.createOrAppendFile(fileName, note);
-    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);
+    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, newTitle, mode);
     if(!isMultiple && this.settings.openNewNote) {
         await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }

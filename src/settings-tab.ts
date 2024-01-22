@@ -161,6 +161,15 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
           this.plugin.settings.normalizeHeaderLevels = value;
           this.plugin.saveData(this.plugin.settings);
         }));
+
+    new Setting(containerEl)
+    .setName('Use only prefixe as file name')
+    .setDesc('Only the specified prefix is used as the file name.')
+    .addToggle(toggle => toggle.setValue(this.plugin.settings.onlyUsePrefixAsFileName)
+      .onChange((value) => {
+        this.plugin.settings.onlyUsePrefixAsFileName = value;
+        this.plugin.saveData(this.plugin.settings);
+      }));
   }
 
   private tempalteDescriptionContent(introText: string): DocumentFragment {
@@ -169,7 +178,7 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
     descEl.appendChild(document.createElement('br'));
     descEl.appendText('Supported placeholders:');
     descEl.appendChild(document.createElement('br'));
-    descEl.appendText('{{date}} {{title}} {{link}} {{new_note_title}} {{new_note_link}} {{new_note_content}}');
+    descEl.appendText('{{date}} {{title}} {{link}} {{new_note_title}} {{new_note_link}} {{new_note_content}} {{new_title}}');
     return descEl;
   }
 
