@@ -85,29 +85,42 @@ export default class NRDoc {
       const heading = new Array(headingLevel + 1).join('#') + ' ';
       const matches: string[][] = [];
       let headingMatch: string[] = [];
+      let inCodeBlock = false;
+
       content.forEach((line, i) => {
-        if(line.startsWith(heading)){
-          if(headingMatch.length > 0) {
+        if (line.trim().startsWith("```")){
+          inCodeBlock = !inCodeBlock;
+          headingMatch.push(line);
+          return;
+        }
+
+        if (inCodeBlock) {
+          headingMatch.push(line);
+        } else {
+          if(line.startsWith(heading)){
+            if(headingMatch.length > 0) {
+              matches.push(headingMatch);
+              headingMatch = [];
+              headingMatch.push(line);
+            } else {
+              headingMatch.push(line);
+            }
+          } else if(headingMatch.length > 0 && !line.startsWith(parentHeading)  ){
+            headingMatch.push(line);
+          } else if(headingMatch.length > 0 && line.startsWith(parentHeading)) {
             matches.push(headingMatch);
             headingMatch = [];
-            headingMatch.push(line);
-          } else {
-            headingMatch.push(line);
           }
-        } else if(headingMatch.length > 0 && !line.startsWith(parentHeading)  ){
-          headingMatch.push(line);
-        } else if(headingMatch.length > 0) {
-          matches.push(headingMatch);
-          headingMatch = [];
-        }
-        //Making sure the last headingMatch array is added to the matches
-        if(i === content.length - 1 && headingMatch.length > 0){
-          matches.push(headingMatch);
-        }
+          //Making sure the last headingMatch array is added to the matches
+          if(i === content.length - 1 && headingMatch.length > 0){
+            matches.push(headingMatch);
+          }
+        } 
+
       });
       return matches;
     }
-  
+   
     
     noteContent(firstLine:string, contentArr:string[], contentOnly?:boolean): string {
       if(this.settings.includeFirstLineAsNoteHeading){
