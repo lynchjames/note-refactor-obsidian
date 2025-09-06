@@ -198,14 +198,14 @@ describe("Note content - First Line as File Name, first line as heading (modifie
   })
 })
 
-describe("Extraction des propriétés front-matter", () => {
+describe("Extraction of front-matter properties", () => {
   beforeAll(async () => {
     fileContents = await fs.readFile(newLocalFrontMatter, "utf8")
     content = toArray(fileContents, 0, 15)
     doc = new NRDoc(new NoteRefactorSettings(), undefined, undefined)
   })
 
-  it("Extraction des propriétés", () => {
+  it("Extraction of properties", () => {
     const props = doc.extractFrontMatterProps(fileContents)
     expect(props).toEqual({
       Title: "Test Note",
@@ -214,9 +214,9 @@ describe("Extraction des propriétés front-matter", () => {
     })
   })
 
-  it("Application du modèle", () => {
+  it("Template application", () => {
     const props = doc.extractFrontMatterProps(fileContents)
-    const template = `{{prop[Title]}}\n\nÉcrit par {{prop[Author]}}\n\nSource: {{prop[Source]}}\n\n{{prop[notfound]}}`
+    const template = `{{prop[Title]}}\n\nWritten by {{prop[Author]}}\n\nSource: {{prop[Source]}}\n\n{{prop[notfound]}}`
 
     const result = doc.templatedContent(
       "",
@@ -230,7 +230,7 @@ describe("Extraction des propriétés front-matter", () => {
       props
     )
     expect(result).toBe(
-      `Test Note\n\nÉcrit par John Doe\n\nSource: [[Link]]\n\n`
+      `Test Note\n\nWritten by John Doe\n\nSource: [[Link]]\n\n`
     )
   })
 })

@@ -24,9 +24,6 @@ export default class NRDoc {
     this.momentRegex = new MomentDateRegex()
   }
 
-  /**
-   * Extrait les propriétés front-matter (KEY: Value ou Key : Value) avant la première ligne "***".
-   */
   extractFrontMatterProps(content: string): Record<string, string> {
     const props: Record<string, string> = {}
     const lines = content.split("\n")
@@ -122,7 +119,7 @@ export default class NRDoc {
     )
     output = this.templatePlaceholders.newNotePath.replace(output, newNotePath)
 
-    // Remplacement des {{prop[KEY]}}
+    // Replace {{prop[KEY]}}
     const propObj = props
     output = output.replace(
       /\{\{prop\[(.+?)\]\}\}/g,
