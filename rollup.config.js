@@ -24,4 +24,5 @@ export default {
       ], flatten: true
     })
   ]
+
 };
