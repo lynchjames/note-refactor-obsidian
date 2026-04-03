@@ -12,6 +12,7 @@ export class NoteRefactorSettings {
     noteLinkTemplate: string = '';
     refactoredNoteTemplate: string = '';
     normalizeHeaderLevels: boolean = false;
+    prefixCurrentNoteNameToNewNotes: boolean = false;
   }
   
 export enum Location {

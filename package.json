@@ -29,8 +29,9 @@
     "moment": "^2.29.4",
     "nyc": "^15.1.0",
     "obsidian": "latest",
-    "rollup": "^2.52.1",
+    "rollup": "^2.79.2",
     "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^9.1.1",
     "tslib": "^2.3.0",
     "typescript": "^4.3.4"

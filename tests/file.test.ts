@@ -163,3 +163,54 @@ describe("Regression - Issue #84 - File Name Duplication Protection", () => {
     });
 
 });
+
+describe("Prefix Current Note Name to New Notes", () => {
+    let fileNames = [
+        ["## Background", "Some text"],
+        ["## Methods", "Paragraph text"],
+        ["## Results", "", "More text"],
+        ["## Background", "", "Duplicate heading"],
+    ];
+    let resetDateMock: () => void;
+    let settings = new NoteRefactorSettings();
+
+    beforeAll(async () => {
+        file = new NRFile(settings);
+        resetDateMock = mockDate(date);
+    });
+
+    it("Should prepend note name with separator when noteName is provided", () => {
+        const deduped = file.ensureUniqueFileNames(fileNames, "Parent Note");
+        expect(deduped[0]).toBe("Parent Note - Background");
+    });
+
+    it("Should prepend note name to all filenames", () => {
+        const deduped = file.ensureUniqueFileNames(fileNames, "Parent Note");
+        expect(deduped[1]).toBe("Parent Note - Methods");
+        expect(deduped[2]).toBe("Parent Note - Results");
+    });
+
+    it("Should still deduplicate when note name is prepended", () => {
+        const deduped = file.ensureUniqueFileNames(fileNames, "Parent Note");
+        expect(deduped[3]).toBe("Parent Note - Background2");
+    });
+
+    it("Should not prepend note name when noteName is undefined", () => {
+        const deduped = file.ensureUniqueFileNames(fileNames);
+        expect(deduped[0]).toBe("Background");
+    });
+
+    it("Should sanitise note name prefix along with heading", () => {
+        const deduped = file.ensureUniqueFileNames([["## Heading"]], "Note #1");
+        expect(deduped[0]).toBe("Note 1 - Heading");
+    });
+
+    it("Should sanitise special characters in both note name and heading", () => {
+        const deduped = file.ensureUniqueFileNames([["## My ## Heading"]], "Note #1");
+        expect(deduped[0]).toBe("Note 1 - My  Heading");
+    });
+
+    afterAll(() => {
+        resetDateMock();
+    });
+});

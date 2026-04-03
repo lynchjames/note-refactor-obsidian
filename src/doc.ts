@@ -32,7 +32,7 @@ export default class NRDoc {
         const currentNoteLink = await this.markdownLink(currentNote.path);
         let contentToInsert = transclude + link;
         
-        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNote.basename, currentNoteLink, fileName, link, '', content);
+        contentToInsert = this.templatedContent(contentToInsert, this.settings.noteLinkTemplate, currentNote.basename, currentNoteLink, fileName, link, '', content, '');
 
         if(mode === 'split'){ 
             this.removeNoteRemainder(doc, contentToInsert);
@@ -49,7 +49,7 @@ export default class NRDoc {
       return link;
     }
 
-    templatedContent(input: string, template: string, currentNoteTitle: string, currentNoteLink: string, newNoteTitle: string, newNoteLink: string, newNotePath: string, newNoteContent: string): string {
+    templatedContent(input: string, template: string, currentNoteTitle: string, currentNoteLink: string, newNoteTitle: string, newNoteLink: string, newNotePath: string, newNoteContent: string, tags: string): string {
       if(template === undefined || template === ''){
         return input;
       }
@@ -60,6 +60,7 @@ export default class NRDoc {
       output = this.templatePlaceholders.newNoteTitle.replace(output, newNoteTitle);
       output = this.templatePlaceholders.newNoteLink.replace(output, newNoteLink);
       output = this.templatePlaceholders.newNoteContent.replace(output, newNoteContent);
+      output = this.templatePlaceholders.tags.replace(output, tags);
       output = this.templatePlaceholders.newNotePath.replace(output, newNotePath);
       return output;
     }

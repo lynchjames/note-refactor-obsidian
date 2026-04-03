@@ -4,6 +4,7 @@ export class NotePlaceholders {
     newNotePath = new Placeholder('new_note_path');
     newNotePathEncoded = new Placeholder('new_note_path_encoded');
     newNoteContent = new Placeholder('new_note_content');
+    tags = new Placeholder('tags');
     title = new Placeholder('title');
     link = new Placeholder('link');
 }

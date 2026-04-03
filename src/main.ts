@@ -5,7 +5,9 @@ import {
   DataAdapter,
   SuggestModal,
   getLinkpath,
-  Editor
+  Editor,
+  getAllTags,
+  MetadataCache
 } from 'obsidian';
 import MomentDateRegex from './moment-date-regex';
 import { NoteRefactorSettingsTab } from './settings-tab';
@@ -15,6 +17,7 @@ import ObsidianFile from './obsidian-file';
 import NRDoc, { ReplaceMode } from './doc';
 import NoteRefactorModal from './note-modal';
 import ModalNoteCreation from './modal-note-creation';
+import { NOTE_NAME_SEPARATOR } from './constants';
 
 export default class NoteRefactor extends Plugin {
   settings: NoteRefactorSettings;
@@ -38,13 +41,19 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:extract-selection-first-line',
       name: 'Extract selection to new note - first line as file name',
-      callback: () => this.editModeGuard(async () => await this.extractSelectionFirstLine('replace-selection')),
+      callback: () => this.editModeGuard(async () => await this.extractSelectionFirstLine('replace-selection', false)),
       hotkeys: [
         {
           modifiers: ["Mod", "Shift"],
           key: "n",
         },
       ],
+    });
+
+    this.addCommand({
+      id: 'app:extract-selection-first-line-with-current-note-prefix',
+      name: 'Extract selection to new note - first line as file name with prefix of current note name',
+      callback: () => this.editModeGuard(async () => await this.extractSelectionFirstLine('replace-selection', true, ' - ')),
     });
 
     this.addCommand({
@@ -68,7 +77,7 @@ export default class NoteRefactor extends Plugin {
     this.addCommand({
       id: 'app:split-note-first-line',
       name: 'Split note here - first line as file name',
-      callback: () => this.editModeGuard(() => this.extractSelectionFirstLine('split')),
+      callback: () => this.editModeGuard(() => this.extractSelectionFirstLine('split', this.settings.prefixCurrentNoteNameToNewNotes, NOTE_NAME_SEPARATOR)),
     });
 
     this.addCommand({
@@ -116,11 +125,12 @@ export default class NoteRefactor extends Plugin {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.editor;
       const headingNotes = this.NRDoc.contentSplitByHeading(doc, headingLevel);
-      const dedupedFileNames = this.file.ensureUniqueFileNames(headingNotes);
+      const notePrefix = this.settings.prefixCurrentNoteNameToNewNotes ? mdView.file.basename : undefined;
+      const dedupedFileNames = this.file.ensureUniqueFileNames(headingNotes, notePrefix);
       headingNotes.forEach((hn, i) => this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], hn, mdView, doc, 'replace-headings', true));
   }
 
-  async extractSelectionFirstLine(mode: ReplaceMode): Promise<void> {
+  async extractSelectionFirstLine(mode: ReplaceMode, prefixCurrentNoteNameToFileName: boolean, noteNameSeparator: string = NOTE_NAME_SEPARATOR): Promise<void> {
       const mdView = this.app.workspace.activeLeaf.view as MarkdownView;
       const doc = mdView.editor;
       if(!mdView) {return}
@@ -128,7 +138,10 @@ export default class NoteRefactor extends Plugin {
       const selectedContent = mode === 'split' ? this.NRDoc.noteRemainder(doc) : this.NRDoc.selectedContent(doc);
       if(selectedContent.length <= 0) { return }
 
-      await this.createNoteWithFirstLineAsFileName(selectedContent[0], selectedContent, mdView, doc, mode, false);
+      const header = prefixCurrentNoteNameToFileName
+          ? mdView.file.basename + noteNameSeparator + selectedContent[0]
+          : selectedContent[0];
+      await this.createNoteWithFirstLineAsFileName(header, selectedContent, mdView, doc, mode, false);
   }
 
   async extractSelectionAutogenerate(mode: ReplaceMode): Promise<void> {
@@ -153,7 +166,7 @@ export default class NoteRefactor extends Plugin {
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');
       const newNoteLink = await this.NRDoc.markdownLink(filePath);
-      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
+      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note, '');
     }
 
     await this.obsFile.createOrAppendFile(fileName, note);
@@ -173,8 +186,10 @@ export default class NoteRefactor extends Plugin {
 
     if (this.settings.refactoredNoteTemplate !== undefined && this.settings.refactoredNoteTemplate !== '') {
       const link = await this.app.fileManager.generateMarkdownLink(mdView.file, '', '', '');
+      const tags = getAllTags(await this.app.metadataCache.getFileCache(mdView.file));
+      const tagsString = tags.unique().sort().join('\n ');
       const newNoteLink = await this.NRDoc.markdownLink(filePath);
-      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
+      note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note, tagsString);
     }
     await this.obsFile.createOrAppendFile(fileName, note);
     await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);

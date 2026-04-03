@@ -70,6 +70,15 @@ export class NoteRefactorSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
+      .setName('Prefix note name to new notes')
+      .setDesc('When splitting notes, prefix the current note\'s name to the new note\'s file name (e.g. "Current Note - New Heading").')
+      .addToggle(toggle => toggle.setValue(this.plugin.settings.prefixCurrentNoteNameToNewNotes)
+        .onChange((value) => {
+          this.plugin.settings.prefixCurrentNoteNameToNewNotes = value;
+          this.plugin.saveData(this.plugin.settings);
+        }));
+
+    new Setting(containerEl)
       .setName('Transclude by default')
       .setDesc('When content has been extracted/split into a new note, include a transclusion of the new note')
       .addToggle(toggle => toggle.setValue(this.plugin.settings.transcludeByDefault)
