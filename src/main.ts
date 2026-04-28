@@ -184,7 +184,16 @@ export default class NoteRefactor extends Plugin {
       note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
     }
     await this.obsFile.createOrAppendFile(fileName, note);
-    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);
+    // For 'replace-headings' the search string used to locate the section in the
+    // original document must include the heading line. Otherwise the body-only
+    // search can match the first occurrence of the body text inside a later
+    // heading line (e.g. "Test 2" inside "## Test 2"), corrupting that heading
+    // instead of replacing the intended section. For other modes originalNote
+    // is unchanged.
+    const searchInOriginal = mode === 'replace-headings'
+      ? selectedContent.join('\n').replace(/\n+$/, '')
+      : originalNote;
+    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, searchInOriginal, mode);
     if(!isMultiple && this.settings.openNewNote) {
         await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }
