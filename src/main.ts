@@ -117,7 +117,14 @@ export default class NoteRefactor extends Plugin {
       const doc = mdView.editor;
       const headingNotes = this.NRDoc.contentSplitByHeading(doc, headingLevel);
       const dedupedFileNames = this.file.ensureUniqueFileNames(headingNotes);
-      headingNotes.forEach((hn, i) => this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], hn, mdView, doc, 'replace-headings', true));
+      // Sequential await is required: createNoteWithFirstLineAsFileName performs a
+      // read-modify-write on the document via doc.setValue(doc.getValue().replace(...)).
+      // Running these in parallel (forEach without await) causes a race condition where
+      // concurrent writes overwrite each other — only the last write survives, leaving
+      // the content of all other heading sections in the original note (duplication).
+      for (let i = 0; i < headingNotes.length; i++) {
+          await this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], headingNotes[i], mdView, doc, 'replace-headings', true);
+      }
   }
 
   async extractSelectionFirstLine(mode: ReplaceMode): Promise<void> {
