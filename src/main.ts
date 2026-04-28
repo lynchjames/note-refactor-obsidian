@@ -117,7 +117,14 @@ export default class NoteRefactor extends Plugin {
       const doc = mdView.editor;
       const headingNotes = this.NRDoc.contentSplitByHeading(doc, headingLevel);
       const dedupedFileNames = this.file.ensureUniqueFileNames(headingNotes);
-      headingNotes.forEach((hn, i) => this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], hn, mdView, doc, 'replace-headings', true));
+      // Sequential await is required: createNoteWithFirstLineAsFileName performs a
+      // read-modify-write on the document via doc.setValue(doc.getValue().replace(...)).
+      // Running these in parallel (forEach without await) causes a race condition where
+      // concurrent writes overwrite each other — only the last write survives, leaving
+      // the content of all other heading sections in the original note (duplication).
+      for (let i = 0; i < headingNotes.length; i++) {
+          await this.createNoteWithFirstLineAsFileName(dedupedFileNames[i], headingNotes[i], mdView, doc, 'replace-headings', true);
+      }
   }
 
   async extractSelectionFirstLine(mode: ReplaceMode): Promise<void> {
@@ -177,7 +184,16 @@ export default class NoteRefactor extends Plugin {
       note = this.NRDoc.templatedContent(note, this.settings.refactoredNoteTemplate, mdView.file.basename, link, fileName, newNoteLink, '', note);
     }
     await this.obsFile.createOrAppendFile(fileName, note);
-    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, originalNote, mode);
+    // For 'replace-headings' the search string used to locate the section in the
+    // original document must include the heading line. Otherwise the body-only
+    // search can match the first occurrence of the body text inside a later
+    // heading line (e.g. "Test 2" inside "## Test 2"), corrupting that heading
+    // instead of replacing the intended section. For other modes originalNote
+    // is unchanged.
+    const searchInOriginal = mode === 'replace-headings'
+      ? selectedContent.join('\n').replace(/\n+$/, '')
+      : originalNote;
+    await this.NRDoc.replaceContent(fileName, filePath, doc, mdView.file, note, searchInOriginal, mode);
     if(!isMultiple && this.settings.openNewNote) {
         await this.app.workspace.openLinkText(fileName, getLinkpath(filePath), true);
     }
