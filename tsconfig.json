@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "module": "ESNext",
-    "target": "es5",
+    "target": "es2018",
     "allowJs": true,
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
